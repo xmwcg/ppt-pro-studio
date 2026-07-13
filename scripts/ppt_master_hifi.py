@@ -30,6 +30,8 @@ import sys
 import tempfile
 from pathlib import Path
 
+from icons import icon_svg, DEFAULT_ICON
+
 # ---------------------------------------------------------------------------
 # Design system — must stay in sync with ppt_studio_generate.py
 # ---------------------------------------------------------------------------
@@ -126,7 +128,9 @@ def vtext(x: float, y: float, content: str, size: float, fill: str, max_w: float
           max_h: float | None = None, align: str = "left", bold: bool = False,
           italic: bool = False) -> tuple[str, float]:
     """Wrap text and shrink font until it fits both width (max_w) and height
-    (max_h). Never exceeds the canvas bottom (H). Returns (svg, next_y)."""
+    (max_h). Readability floor is 11pt: below that the text is truncated with
+    an ellipsis instead of shrinking into an unreadable size. Returns
+    (svg, next_y)."""
     if max_h is None:
         max_h = H - y - 4
     else:
@@ -138,9 +142,20 @@ def vtext(x: float, y: float, content: str, size: float, fill: str, max_w: float
         nlines = 0
         for para in content.split("\n"):
             nlines += max(1, len(wrap(para, s, max_w)))
-        if nlines * lh <= max_h or s <= 9:
+        if nlines * lh <= max_h or s <= 11:
             break
         s -= 1.0
+    s = max(s, 11.0)
+    # Truncate (with ellipsis) if even the floor overflows the box height.
+    while len(content) > 1:
+        nlines = 0
+        for para in content.split("\n"):
+            nlines += max(1, len(wrap(para, s, max_w)))
+        if nlines * s * 1.25 <= max_h:
+            break
+        content = content[:-1]
+    if content and content != content.rstrip():
+        content = content.rstrip() + "\u2026"
     svg, ny = text_block(x, y, content, s, fill, bold=bold, align=align,
                          max_w=max_w, line_h=s * 1.25)
     return svg, ny
@@ -179,6 +194,10 @@ class SvgSlide:
     def _bg(self):
         return rect(0, 0, W, H, self.p["bg"])
 
+    def _icon(self, name, x, y, size_px, color=None):
+        return icon_svg(name, x, y, size_px, color or self.p["primary"],
+                        stroke_px=size_px * 0.06)
+
     def _footer(self, idx: int, footer: str, page_numbers: bool):
         out = []
         if footer:
@@ -188,15 +207,18 @@ class SvgSlide:
                              self.p["muted"], align="right"))
         return "\n".join(out)
 
-    def _title_bar(self, title, subtitle=None, num=None):
+    def _title_bar(self, title, subtitle=None, num=None, stype="content",
+                   icon=None):
         out = []
-        t, _ = vtext(X(0.6), Y(0.4), title, PX(28), self.p["primary"], bold=True,
-                     max_w=X(10.6), max_h=Y(0.7))
+        name = icon or DEFAULT_ICON.get(stype, "list")
+        out.append(self._icon(name, X(0.6), Y(0.42), PX(28)))
+        t, _ = vtext(X(1.2), Y(0.4), title, PX(28), self.p["primary"], bold=True,
+                     max_w=X(10.0), max_h=Y(0.7))
         out.append(t)
-        out.append(rect(X(0.6), Y(1.12), X(2.2), PX(3), self.p["primary"]))
+        out.append(rect(X(1.2), Y(1.12), X(2.2), PX(3), self.p["primary"]))
         if subtitle:
-            s, _ = vtext(X(0.6), Y(1.22), subtitle, PX(14), self.p["secondary"],
-                         max_w=X(11.5), max_h=Y(0.5))
+            s, _ = vtext(X(1.2), Y(1.22), subtitle, PX(14), self.p["secondary"],
+                         max_w=X(11.0), max_h=Y(0.5))
             out.append(s)
         if num:
             n, _ = vtext(X(11.0), Y(0.4), num, PX(22), self.p["muted"], bold=True,
@@ -209,18 +231,20 @@ class SvgSlide:
         title = d.get("title", "")
         sub = d.get("subtitle", "")
         badge = d.get("badge", "")
+        icon = d.get("icon", "rocket")
         variant = d.get("variant", "centered")
         if variant == "left":
-            out.append(rect(X(0.9), Y(2.2), PX(3), Y(2.0), self.p["primary"]))
-            t, _ = vtext(X(1.1), Y(2.4), title, PX(40), self.p["primary"],
+            out.append(self._icon(icon, X(0.9), Y(2.4), PX(48)))
+            t, _ = vtext(X(1.1), Y(3.5), title, PX(40), self.p["primary"],
                          bold=True, max_w=X(10.5), max_h=Y(1.7))
             out.append(t)
             if sub:
-                s, _ = vtext(X(1.1), Y(4.2), sub, PX(20), self.p["secondary"],
+                s, _ = vtext(X(1.1), Y(5.3), sub, PX(20), self.p["secondary"],
                              max_w=X(10.5), max_h=Y(1.0))
                 out.append(s)
         else:
-            t, _ = vtext(W / 2, Y(2.3), title, PX(46), self.p["primary"],
+            out.append(self._icon(icon, W / 2 - PX(24), Y(1.5), PX(48)))
+            t, _ = vtext(W / 2, Y(2.6), title, PX(46), self.p["primary"],
                          bold=True, align="center", max_w=X(11.3), max_h=Y(2.0))
             out.append(t)
             if sub:
@@ -237,18 +261,19 @@ class SvgSlide:
         out = [self._bg(),
                rect(0, Y(3.1), W, Y(1.3), self.p["surface"]),
                rect(0, Y(3.1), PX(3), Y(1.3), self.p["primary"])]
-        t, _ = vtext(X(0.9), Y(3.25), d.get("title", ""), PX(34),
-                     self.p["primary"], bold=True, max_w=X(11.5), max_h=Y(1.0))
+        out.append(self._icon(d.get("icon", "bookmark"), X(0.6), Y(3.28), PX(46)))
+        t, _ = vtext(X(1.7), Y(3.25), d.get("title", ""), PX(34),
+                     self.p["primary"], bold=True, max_w=X(11.0), max_h=Y(1.0))
         out.append(t)
         if d.get("subtitle"):
-            s, _ = vtext(X(0.9), Y(4.3), d["subtitle"], PX(14), self.p["muted"],
-                         max_w=X(11.5), max_h=Y(0.5))
+            s, _ = vtext(X(1.7), Y(4.3), d["subtitle"], PX(14), self.p["muted"],
+                         max_w=X(11.0), max_h=Y(0.5))
             out.append(s)
         return out
 
     def agenda(self, d):
         out = [self._bg(), self._title_bar(d.get("title", "目录"),
-                                           d.get("subtitle"))]
+                                           d.get("subtitle"), stype="agenda")]
         items = d.get("items", [])
         n = len(items)
         top, bottom = Y(1.7), Y(6.9)
@@ -285,7 +310,7 @@ class SvgSlide:
 
     def content(self, d):
         out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"),
-                                           d.get("num"))]
+                                           d.get("num"), stype="content")]
         items = d.get("items", [])
         if d.get("columns", 1) == 2 and len(items) > 3:
             half = (len(items) + 1) // 2
@@ -296,7 +321,8 @@ class SvgSlide:
         return out
 
     def two_column(self, d):
-        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle")),
+        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"),
+                                           stype="two_column"),
                rect(X(0.6), Y(1.7), X(5.9), Y(4.8), self.p["surface"]),
                rect(X(6.8), Y(1.7), X(5.9), Y(4.8), self.p["surface"])]
         lt, _ = vtext(X(0.9), Y(1.9), d.get("left_title", "左栏"), PX(16),
@@ -310,7 +336,8 @@ class SvgSlide:
         return out
 
     def table(self, d):
-        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"))]
+        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"),
+                                           stype="table")]
         headers = d.get("headers", [])
         rows = d.get("rows", [])
         nrows = len(rows) + 1
@@ -335,7 +362,8 @@ class SvgSlide:
         return out
 
     def chart(self, d):
-        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"))]
+        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"),
+                                           stype="chart")]
         ctype = d.get("chart_type", "bar").lower()
         cats = d.get("categories", [])
         series = d.get("series", [])
@@ -389,7 +417,8 @@ class SvgSlide:
         return out
 
     def timeline(self, d):
-        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"))]
+        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"),
+                                           stype="timeline")]
         ms = d.get("milestones", [])
         if not ms:
             return out
@@ -412,6 +441,7 @@ class SvgSlide:
 
     def quote(self, d):
         out = [self._bg(),
+               self._icon(d.get("icon", "quote"), X(0.9), Y(1.7), PX(48)),
                _text(X(1.2), Y(1.7), "\u201C", PX(120), self.p["primary"], bold=True)]
         q, _ = vtext(X(1.5), Y(2.3), d.get("quote", ""), PX(26), self.p["text"],
                      italic=True, max_w=X(10.5), max_h=Y(2.6))
@@ -423,7 +453,8 @@ class SvgSlide:
         return out
 
     def image(self, d):
-        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"))]
+        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"),
+                                           stype="image")]
         path = d.get("image_path", "")
         x, y, w, h = X(1.2), Y(1.8), X(10.9), Y(4.6)
         if path and os.path.exists(path):
@@ -436,7 +467,7 @@ class SvgSlide:
         return out
 
     def summary(self, d):
-        out = [self._bg(), self._title_bar(d.get("title", "总结")),
+        out = [self._bg(), self._title_bar(d.get("title", "总结"), stype="summary"),
                self._bullets(d.get("points", []), X(0.9), Y(1.7), X(11.5), Y(0.66))]
         if d.get("conclusion"):
             out.append(rect(X(0.9), Y(6.0), X(11.5), Y(0.9), self.p["primary"]))
@@ -446,17 +477,19 @@ class SvgSlide:
         return out
 
     def bullets(self, d):
-        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle")),
+        out = [self._bg(), self._title_bar(d.get("title", ""), d.get("subtitle"),
+                                           stype="bullets"),
                self._bullets(d.get("items", []), X(0.9), Y(1.7), X(11.5), Y(0.66))]
         return out
 
     def contact(self, d):
         out = [self._bg()]
-        t, _ = vtext(W / 2, Y(2.2), d.get("title", "联系我们"), PX(36),
+        out.append(self._icon(d.get("icon", "mail"), W / 2 - PX(24), Y(1.4), PX(48)))
+        t, _ = vtext(W / 2, Y(2.4), d.get("title", "联系我们"), PX(36),
                      self.p["primary"], bold=True, align="center",
                      max_w=X(11.3), max_h=Y(1.0))
         out.append(t)
-        info, _ = vtext(W / 2, Y(3.4), d.get("info", ""), PX(16), self.p["text"],
+        info, _ = vtext(W / 2, Y(3.6), d.get("info", ""), PX(16), self.p["text"],
                         align="center", max_w=X(11.3), max_h=Y(2.0))
         out.append(info)
         return out

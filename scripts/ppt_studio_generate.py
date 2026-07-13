@@ -28,10 +28,75 @@ from pptx.chart.data import CategoryChartData
 from pptx.enum.chart import XL_CHART_TYPE
 from pptx.oxml.ns import qn
 
+try:
+    from icons import add_icon_to_slide, DEFAULT_ICON
+except ImportError:  # allow running with scripts/ as cwd
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from icons import add_icon_to_slide, DEFAULT_ICON
+
 # ---------------------------------------------------------------------------
 # Design system — 5 commercial palettes (+ the dark-tech reference palette)
 # Every palette: bg, surface, primary, secondary, text, muted, accent, line
 # ---------------------------------------------------------------------------
+
+# 8pt grid + type scale tokens (design-system 2.0). All spacing in inches
+# is kept on an 8px-multiple rhythm; font sizes follow a strict scale so the
+# hierarchy reads consistently across every slide.
+GRID = 0.05          # base grid unit (in) ~ 4px
+SPACING = {          # named spacing tokens (in)
+    "xs": 0.1, "sm": 0.2, "md": 0.3, "lg": 0.5, "xl": 0.8, "xxl": 1.2,
+}
+TYPE = {             # type scale (pt)
+    "caption": 9, "body": 15, "body_sm": 12, "title": 28,
+    "subtitle": 14, "display": 44, "section": 34, "hero": 46,
+}
+FONT_FLOOR = 11      # never shrink body text below this (readability floor)
+
+
+def _char_w_pt(ch: str, sz: float) -> float:
+    """Approx glyph advance in points: CJK ~full em, ASCII ~0.55em."""
+    return sz if ord(ch) > 0x2E80 else sz * 0.55
+
+
+def _estimate_lines(text: str, sz: float, w_in: float) -> int:
+    line_w = w_in * 72.0
+    lines = 0
+    for para in text.split("\n"):
+        if not para:
+            lines += 1
+            continue
+        w = 0.0
+        l = 1
+        for ch in para:
+            cw = _char_w_pt(ch, sz)
+            if w + cw > line_w and w > 0:
+                l += 1
+                w = cw
+            else:
+                w += cw
+        lines += l
+    return max(1, lines)
+
+
+def _fit_text(text: str, w_in: float, h_in: float, size: float, floor=FONT_FLOOR):
+    """Pick the largest font >= floor that fits the box; if even the floor
+    overflows, truncate the text (adding an ellipsis) instead of shrinking
+    into an unreadable size."""
+    sz = float(size)
+    while True:
+        need = _estimate_lines(text, sz, w_in) * sz * 1.25
+        if need <= h_in * 72.0 or sz <= floor:
+            break
+        sz -= 1.0
+    sz = max(sz, float(floor))
+    if _estimate_lines(text, sz, w_in) * sz * 1.25 > h_in * 72.0:
+        while len(text) > 1 and \
+                _estimate_lines(text, sz, w_in) * sz * 1.25 > h_in * 72.0:
+            text = text[:-1]
+        text = text.rstrip() + "\u2026"
+    return sz, text
+
 PALETTES = {
     "tech_dark": {  # 深色科技风 (from the commercial delivery reference pack)
         "bg": "0D1117", "surface": "151D2E", "primary": "D4A060", "secondary": "58A6FF",
@@ -86,6 +151,73 @@ class Studio:
         self.prs.slide_height = SLIDE_H
         self._blank = self.prs.slide_layouts[6]
 
+    # -- master / theme -----------------------------------------------------
+    def _apply_master_theme(self, out_path):
+        """Write brand colors + font into the pptx theme (theme1.xml) so they
+        are editable via the PowerPoint/WPS 'Colors' and 'Fonts' panels (one
+        place to restyle the whole deck). Patches the saved .pptx zip directly
+        to stay robust across python-pptx builds. Standard OOXML, WPS-safe."""
+        try:
+            import zipfile
+            import shutil
+            from lxml import etree
+            ns = "http://schemas.openxmlformats.org/drawingml/2006/main"
+            pal = self.p
+            order = [("dk1", pal["bg"]), ("lt1", pal["text"]),
+                     ("dk2", pal["secondary"]), ("lt2", pal["surface"]),
+                     ("accent1", pal["primary"]), ("accent2", pal["secondary"]),
+                     ("accent3", pal["accent"]), ("accent4", pal["muted"]),
+                     ("accent5", pal["line"]), ("accent6", pal["primary"])]
+            tmp = out_path + ".tmp"
+            src = zipfile.ZipFile(out_path, "r")
+            theme_name = [n for n in src.namelist()
+                          if __import__("re").search(r"theme1?\.xml$", n)]
+            if not theme_name:
+                src.close()
+                return
+            theme_name = theme_name[0]
+            root = etree.fromstring(src.read(theme_name))
+            te = root.find(f"{{{ns}}}themeElements")
+            if te is None:
+                src.close()
+                return
+            cs = te.find(f"{{{ns}}}clrScheme")
+            if cs is not None:
+                for c in list(cs):
+                    cs.remove(c)
+                for tag, hexv in order:
+                    e = etree.SubElement(cs, f"{{{ns}}}{tag}")
+                    c = etree.SubElement(e, f"{{{ns}}}srgbClr")
+                    c.set("val", hexv)
+            fs = te.find(f"{{{ns}}}fontScheme")
+            if fs is not None:
+                for which in ("majorFont", "minorFont"):
+                    mf = fs.find(f"{{{ns}}}{which}")
+                    if mf is None:
+                        continue
+                    latin = mf.find(f"{{{ns}}}latin")
+                    if latin is None:
+                        latin = etree.SubElement(mf, f"{{{ns}}}latin")
+                    latin.set("typeface", pal["font"])
+            new_theme = etree.tostring(root, xml_declaration=True,
+                                       encoding="UTF-8", standalone=True)
+            with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as zo:
+                for item in src.infolist():
+                    if item.filename == theme_name:
+                        zo.writestr(item, new_theme)
+                    else:
+                        zo.writestr(item, src.read(item.filename))
+            src.close()
+            shutil.move(tmp, out_path)
+        except Exception as e:  # theme is best-effort, never fatal
+            sys.stderr.write("warning: master theme skipped: %s\n" % e)
+
+    def _icon(self, slide, name, x, y, size, color):
+        try:
+            add_icon_to_slide(slide, name, x, y, size, color, stroke_w_pt=1.5)
+        except Exception:
+            pass
+
     # -- low level helpers ---------------------------------------------------
     def _slide(self):
         return self.prs.slides.add_slide(self._blank)
@@ -96,14 +228,14 @@ class Studio:
         slide.background.fill.fore_color.rgb = _c(color)
 
     def _txt(self, slide, x, y, w, h, text, size=18, color=None, bold=False,
-             align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP, italic=False, font=None):
+             align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP, italic=False, font=None,
+             floor=FONT_FLOOR):
+        # Enforce readability floor + line-length control: shrink only down to
+        # `floor`, then truncate with an ellipsis instead of going tiny.
+        size, text = _fit_text(text, w, h, size, floor=floor)
         tb = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
         tf = tb.text_frame
         tf.word_wrap = True
-        # Auto-shrink font so text never overflows its box vertically
-        # (horizontal overflow is handled by word_wrap). Prevents content
-        # spilling past the slide edge.
-        tf.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
         tf.vertical_anchor = anchor
         tf.margin_left = Inches(0.05)
         tf.margin_right = Inches(0.05)
@@ -136,17 +268,20 @@ class Studio:
     def _footer(self, slide, idx, footer, page_numbers):
         if footer:
             self._txt(slide, 0.5, 7.05, 9, 0.35, footer, size=9,
-                      color=self.p["muted"])
+                      color=self.p["muted"], floor=9)
         if page_numbers:
             self._txt(slide, 12.3, 7.05, 0.8, 0.35, str(idx), size=9,
-                      color=self.p["muted"], align=PP_ALIGN.RIGHT)
+                      color=self.p["muted"], align=PP_ALIGN.RIGHT, floor=9)
 
-    def _title_bar(self, slide, title, subtitle=None, num=None):
-        self._txt(slide, 0.6, 0.4, 11.5, 0.7, title, size=28, bold=True,
+    def _title_bar(self, slide, title, subtitle=None, num=None, stype="content",
+                   icon=None):
+        name = icon or DEFAULT_ICON.get(stype, "list")
+        self._icon(slide, name, 0.55, 0.42, 0.5, self.p["primary"])
+        self._txt(slide, 1.2, 0.4, 11.0, 0.7, title, size=28, bold=True,
                   color=self.p["primary"])
-        self._rect(slide, 0.6, 1.12, 2.2, 0.06, self.p["primary"])
+        self._rect(slide, 1.2, 1.12, 2.2, 0.06, self.p["primary"])
         if subtitle:
-            self._txt(slide, 0.6, 1.22, 11.5, 0.45, subtitle, size=14,
+            self._txt(slide, 1.2, 1.22, 11.0, 0.45, subtitle, size=14,
                       color=self.p["secondary"])
         if num:
             self._txt(slide, 11.8, 0.4, 1.0, 0.7, num, size=22, bold=True,
@@ -159,37 +294,42 @@ class Studio:
         title = data.get("title", "")
         subtitle = data.get("subtitle", "")
         badge = data.get("badge", "")
+        icon = data.get("icon", "rocket")
         if variant == "left":
-            self._txt(s, 0.9, 2.4, 11, 1.4, title, size=44, bold=True,
+            self._icon(s, icon, 0.9, 2.4, 0.9, self.p["primary"])
+            self._txt(s, 0.9, 3.5, 11, 1.4, title, size=44, bold=True,
                       color=self.p["primary"])
             if subtitle:
-                self._txt(s, 0.9, 3.9, 10, 0.8, subtitle, size=20,
+                self._txt(s, 0.9, 5.0, 10, 0.8, subtitle, size=20,
                           color=self.p["secondary"])
-            self._rect(s, 0.9, 2.2, 0.12, 2.0, self.p["primary"])
         else:  # centered
-            self._txt(s, 1, 2.3, 11.3, 1.5, title, size=46, bold=True,
+            self._icon(s, icon, 6.27, 1.5, 0.8, self.p["primary"])
+            self._txt(s, 1, 2.6, 11.3, 1.5, title, size=46, bold=True,
                       color=self.p["primary"], align=PP_ALIGN.CENTER)
             if subtitle:
-                self._txt(s, 1, 3.9, 11.3, 0.8, subtitle, size=20,
+                self._txt(s, 1, 4.2, 11.3, 0.8, subtitle, size=20,
                           color=self.p["secondary"], align=PP_ALIGN.CENTER)
         if badge:
-            self._txt(s, 1, 5.2, 11.3, 0.5, badge, size=13,
+            self._txt(s, 1, 5.5, 11.3, 0.5, badge, size=13,
                       color=self.p["muted"], align=PP_ALIGN.CENTER)
 
     def section(self, s, data):
         self._bg(s)
         self._rect(s, 0, 3.1, 13.333, 1.3, self.p["surface"])
         self._rect(s, 0, 3.1, 0.18, 1.3, self.p["primary"])
-        self._txt(s, 0.9, 3.25, 11.5, 1.0, data.get("title", ""),
+        self._icon(s, data.get("icon", "bookmark"), 0.6, 3.28, 0.9,
+                   self.p["primary"])
+        self._txt(s, 1.7, 3.25, 11.0, 1.0, data.get("title", ""),
                   size=34, bold=True, color=self.p["primary"],
                   anchor=MSO_ANCHOR.MIDDLE)
         if data.get("subtitle"):
-            self._txt(s, 0.9, 4.25, 11.5, 0.5, data["subtitle"], size=14,
+            self._txt(s, 1.7, 4.25, 11.0, 0.5, data["subtitle"], size=14,
                       color=self.p["muted"])
 
     def agenda(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", "目录"), data.get("subtitle"))
+        self._title_bar(s, data.get("title", "目录"), data.get("subtitle"),
+                       stype="agenda")
         items = data.get("items", [])
         top, bottom = 1.7, 6.9
         gap = min(0.78, (bottom - top) / max(1, len(items)))
@@ -203,7 +343,7 @@ class Studio:
     def content(self, s, data):
         self._bg(s)
         self._title_bar(s, data.get("title", ""), data.get("subtitle"),
-                        data.get("num"))
+                        data.get("num"), stype="content")
         items = data.get("items", [])
         columns = data.get("columns", 1)
         if columns == 2 and len(items) > 3:
@@ -235,7 +375,8 @@ class Studio:
 
     def two_column(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="two_column")
         self._rect(s, 0.6, 1.7, 5.9, 4.8, self.p["surface"])
         self._rect(s, 6.8, 1.7, 5.9, 4.8, self.p["surface"])
         self._txt(s, 0.9, 1.9, 5.3, 0.5, data.get("left_title", "左栏"),
@@ -247,7 +388,8 @@ class Studio:
 
     def table(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="table")
         headers = data.get("headers", [])
         rows = data.get("rows", [])
         nrows = len(rows) + 1
@@ -283,7 +425,8 @@ class Studio:
 
     def chart(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="chart")
         ctype = data.get("chart_type", "bar").lower()
         mapping = {"bar": XL_CHART_TYPE.COLUMN_CLUSTERED,
                    "column": XL_CHART_TYPE.COLUMN_CLUSTERED,
@@ -306,7 +449,8 @@ class Studio:
 
     def timeline(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="timeline")
         ms = data.get("milestones", [])
         if not ms:
             return
@@ -325,6 +469,7 @@ class Studio:
 
     def quote(self, s, data):
         self._bg(s)
+        self._icon(s, data.get("icon", "quote"), 0.7, 1.6, 0.9, self.p["primary"])
         self._txt(s, 1.2, 1.7, 1.5, 1.5, "\u201C", size=120, bold=True,
                   color=self.p["primary"])
         self._txt(s, 1.5, 2.3, 10.5, 2.5, data.get("quote", ""), size=26,
@@ -335,7 +480,8 @@ class Studio:
 
     def image(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="image")
         path = data.get("image_path", "")
         x, y, w, h = 1.2, 1.8, 10.9, 4.6
         if path and os.path.exists(path):
@@ -348,7 +494,7 @@ class Studio:
 
     def summary(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", "总结"))
+        self._title_bar(s, data.get("title", "总结"), stype="summary")
         self._bullets(s, data.get("points", []), 0.9, 1.7, 11.5, 0.66)
         if data.get("conclusion"):
             self._rect(s, 0.9, 6.0, 11.5, 0.9, self.p["primary"])
@@ -357,15 +503,18 @@ class Studio:
 
     def bullets(self, s, data):
         self._bg(s)
-        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="bullets")
         self._bullets(s, data.get("items", []), 0.9, 1.7, 11.5, 0.66)
 
     def contact(self, s, data):
         self._bg(s)
-        self._txt(s, 1, 2.2, 11.3, 1.0, data.get("title", "联系我们"),
+        self._icon(s, data.get("icon", "mail"), 6.27, 1.4, 0.8,
+                   self.p["primary"])
+        self._txt(s, 1, 2.4, 11.3, 1.0, data.get("title", "联系我们"),
                   size=36, bold=True, color=self.p["primary"],
                   align=PP_ALIGN.CENTER)
-        self._txt(s, 1, 3.4, 11.3, 1.5, data.get("info", ""), size=16,
+        self._txt(s, 1, 3.6, 11.3, 1.5, data.get("info", ""), size=16,
                   color=self.p["text"], align=PP_ALIGN.CENTER)
 
     # -- dispatch ------------------------------------------------------------
@@ -396,6 +545,13 @@ class Studio:
                              brief.get("page_numbers", True))
         os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
         self.prs.save(out_path)
+
+        # Best-effort: brand the slide-master theme (colors + fonts editable
+        # via the PPT/WPS panels). Patches the saved zip; never fatal.
+        try:
+            self._apply_master_theme(out_path)
+        except Exception as e:  # pragma: no cover - defensive
+            sys.stderr.write("warning: master theme skipped: %s\n" % e)
 
         # Best-effort: inject random per-slide page transitions (翻页随机动画).
         # Uses ppt-master's vetted OOXML transition core via add_transitions.py.
