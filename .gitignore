@@ -1,0 +1,12 @@
+# Build/test artifacts — keep the two deliverable pptx, exclude scratch files
+output/validate.py
+output/mcp_out.pptx
+output/mcp_test.js
+
+# OS / editor noise
+Thumbs.db
+.DS_Store
+
+# Python bytecode
+__pycache__/
+*.pyc

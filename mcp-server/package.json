@@ -1,0 +1,16 @@
+{
+  "name": "ppt-studio-mcp",
+  "version": "1.0.0",
+  "description": "MCP server exposing the PPT Pro Studio pipeline (generate_ppt / qa_check / list_styles). Zero dependencies, runs on stdio JSON-RPC.",
+  "bin": {
+    "ppt-studio-mcp": "./ppt-studio-mcp.js"
+  },
+  "scripts": {
+    "start": "node ppt-studio-mcp.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "keywords": ["ppt", "pptx", "mcp", "presentation", "skill", "agent"]
+}

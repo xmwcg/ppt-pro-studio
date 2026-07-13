@@ -1,0 +1,450 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+ppt_studio_generate.py — PPT Pro Studio core renderer.
+
+Turns a structured JSON *brief* into a commercial-grade, fully editable .pptx.
+Designed to be called by:
+  * the ppt-pro-studio SKILL (LLM agents following the workflow)
+  * the ppt-studio-mcp server (any MCP-capable LLM)
+  * directly from the CLI
+
+No network, no external services, no watermarks. MIT-0.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from pathlib import Path
+from pptx import Presentation
+from pptx.util import Inches, Pt, Emu
+from pptx.dml.color import RGBColor
+from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
+from pptx.enum.shapes import MSO_SHAPE
+from pptx.chart.data import CategoryChartData
+from pptx.enum.chart import XL_CHART_TYPE
+from pptx.oxml.ns import qn
+
+# ---------------------------------------------------------------------------
+# Design system — 5 commercial palettes (+ the dark-tech reference palette)
+# Every palette: bg, surface, primary, secondary, text, muted, accent, line
+# ---------------------------------------------------------------------------
+PALETTES = {
+    "tech_dark": {  # 深色科技风 (from the commercial delivery reference pack)
+        "bg": "0D1117", "surface": "151D2E", "primary": "D4A060", "secondary": "58A6FF",
+        "text": "FFFFFF", "muted": "8B949E", "accent": "3FB950", "line": "30363D",
+        "font": "Microsoft YaHei",
+    },
+    "business_blue": {
+        "bg": "FFFFFF", "surface": "F2F6FC", "primary": "1F4E79", "secondary": "2E75B6",
+        "text": "1A1A1A", "muted": "5A5A5A", "accent": "C55A11", "line": "D6E0F0",
+        "font": "Microsoft YaHei",
+    },
+    "creative_purple": {
+        "bg": "1B1033", "surface": "2A1B4A", "primary": "C77DFF", "secondary": "7B2FBE",
+        "text": "F5EEFF", "muted": "B39DCE", "accent": "FF8FB1", "line": "3D2A63",
+        "font": "Microsoft YaHei",
+    },
+    "academic_white": {
+        "bg": "FFFFFF", "surface": "FAFAFA", "primary": "202020", "secondary": "006633",
+        "text": "1A1A1A", "muted": "666666", "accent": "B00020", "line": "DDDDDD",
+        "font": "Microsoft YaHei",
+    },
+    "minimal_gray": {
+        "bg": "FAFAFA", "surface": "F0F0F0", "primary": "222222", "secondary": "666666",
+        "text": "1A1A1A", "muted": "999999", "accent": "007ACC", "line": "E0E0E0",
+        "font": "Microsoft YaHei",
+    },
+}
+
+STYLE_LABELS = {
+    "tech_dark": "深色科技风 (Tech Dark)",
+    "business_blue": "商务蓝 (Business Blue)",
+    "creative_purple": "创意紫 (Creative Purple)",
+    "academic_white": "学术白 (Academic White)",
+    "minimal_gray": "简约灰 (Minimal Gray)",
+}
+
+FONT = "Microsoft YaHei"  # cross-platform: falls back to default on non-Windows
+EMU_IN = 914400
+SLIDE_W = Inches(13.333)
+SLIDE_H = Inches(7.5)
+
+
+def _c(hex_str: str) -> RGBColor:
+    return RGBColor.from_string(hex_str)
+
+
+class Studio:
+    def __init__(self, palette_name: str):
+        self.p = PALETTES.get(palette_name, PALETTES["tech_dark"])
+        self.prs = Presentation()
+        self.prs.slide_width = SLIDE_W
+        self.prs.slide_height = SLIDE_H
+        self._blank = self.prs.slide_layouts[6]
+
+    # -- low level helpers ---------------------------------------------------
+    def _slide(self):
+        return self.prs.slides.add_slide(self._blank)
+
+    def _bg(self, slide, color=None):
+        color = color or self.p["bg"]
+        slide.background.fill.solid()
+        slide.background.fill.fore_color.rgb = _c(color)
+
+    def _txt(self, slide, x, y, w, h, text, size=18, color=None, bold=False,
+             align=PP_ALIGN.LEFT, anchor=MSO_ANCHOR.TOP, italic=False, font=None):
+        tb = slide.shapes.add_textbox(Inches(x), Inches(y), Inches(w), Inches(h))
+        tf = tb.text_frame
+        tf.word_wrap = True
+        # Auto-shrink font so text never overflows its box vertically
+        # (horizontal overflow is handled by word_wrap). Prevents content
+        # spilling past the slide edge.
+        tf.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
+        tf.vertical_anchor = anchor
+        tf.margin_left = Inches(0.05)
+        tf.margin_right = Inches(0.05)
+        lines = text.split("\n")
+        for i, line in enumerate(lines):
+            para = tf.paragraphs[0] if i == 0 else tf.add_paragraph()
+            para.alignment = align
+            run = para.add_run()
+            run.text = line
+            run.font.size = Pt(size)
+            run.font.bold = bold
+            run.font.italic = italic
+            run.font.name = font or self.p["font"]
+            run.font.color.rgb = _c(color or self.p["text"])
+        return tb
+
+    def _rect(self, slide, x, y, w, h, fill, line=None, line_w=1):
+        shp = slide.shapes.add_shape(MSO_SHAPE.RECTANGLE, Inches(x), Inches(y),
+                                     Inches(w), Inches(h))
+        shp.fill.solid()
+        shp.fill.fore_color.rgb = _c(fill)
+        if line:
+            shp.line.color.rgb = _c(line)
+            shp.line.width = Pt(line_w)
+        else:
+            shp.line.fill.background()
+        shp.shadow.inherit = False
+        return shp
+
+    def _footer(self, slide, idx, footer, page_numbers):
+        if footer:
+            self._txt(slide, 0.5, 7.05, 9, 0.35, footer, size=9,
+                      color=self.p["muted"])
+        if page_numbers:
+            self._txt(slide, 12.3, 7.05, 0.8, 0.35, str(idx), size=9,
+                      color=self.p["muted"], align=PP_ALIGN.RIGHT)
+
+    def _title_bar(self, slide, title, subtitle=None, num=None):
+        self._txt(slide, 0.6, 0.4, 11.5, 0.7, title, size=28, bold=True,
+                  color=self.p["primary"])
+        self._rect(slide, 0.6, 1.12, 2.2, 0.06, self.p["primary"])
+        if subtitle:
+            self._txt(slide, 0.6, 1.22, 11.5, 0.45, subtitle, size=14,
+                      color=self.p["secondary"])
+        if num:
+            self._txt(slide, 11.8, 0.4, 1.0, 0.7, num, size=22, bold=True,
+                      color=self.p["muted"], align=PP_ALIGN.RIGHT)
+
+    # -- slide renderers -----------------------------------------------------
+    def cover(self, s, data):
+        self._bg(s)
+        variant = data.get("variant", "centered")
+        title = data.get("title", "")
+        subtitle = data.get("subtitle", "")
+        badge = data.get("badge", "")
+        if variant == "left":
+            self._txt(s, 0.9, 2.4, 11, 1.4, title, size=44, bold=True,
+                      color=self.p["primary"])
+            if subtitle:
+                self._txt(s, 0.9, 3.9, 10, 0.8, subtitle, size=20,
+                          color=self.p["secondary"])
+            self._rect(s, 0.9, 2.2, 0.12, 2.0, self.p["primary"])
+        else:  # centered
+            self._txt(s, 1, 2.3, 11.3, 1.5, title, size=46, bold=True,
+                      color=self.p["primary"], align=PP_ALIGN.CENTER)
+            if subtitle:
+                self._txt(s, 1, 3.9, 11.3, 0.8, subtitle, size=20,
+                          color=self.p["secondary"], align=PP_ALIGN.CENTER)
+        if badge:
+            self._txt(s, 1, 5.2, 11.3, 0.5, badge, size=13,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+
+    def section(self, s, data):
+        self._bg(s)
+        self._rect(s, 0, 3.1, 13.333, 1.3, self.p["surface"])
+        self._rect(s, 0, 3.1, 0.18, 1.3, self.p["primary"])
+        self._txt(s, 0.9, 3.25, 11.5, 1.0, data.get("title", ""),
+                  size=34, bold=True, color=self.p["primary"],
+                  anchor=MSO_ANCHOR.MIDDLE)
+        if data.get("subtitle"):
+            self._txt(s, 0.9, 4.25, 11.5, 0.5, data["subtitle"], size=14,
+                      color=self.p["muted"])
+
+    def agenda(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", "目录"), data.get("subtitle"))
+        items = data.get("items", [])
+        top, bottom = 1.7, 6.9
+        gap = min(0.78, (bottom - top) / max(1, len(items)))
+        for i, it in enumerate(items):
+            y = top + i * gap
+            self._txt(s, 0.9, y, 0.7, 0.6, f"{i+1:02d}", size=20, bold=True,
+                      color=self.p["secondary"])
+            self._txt(s, 1.7, y, 10.5, 0.6, it, size=16, color=self.p["text"])
+            self._rect(s, 0.9, y + min(gap, 0.78) - 0.12, 11.4, 0.015, self.p["line"])
+
+    def content(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                        data.get("num"))
+        items = data.get("items", [])
+        columns = data.get("columns", 1)
+        if columns == 2 and len(items) > 3:
+            half = (len(items) + 1) // 2
+            self._bullets(s, items[:half], 0.9, 1.7, 5.8, 0.62)
+            self._bullets(s, items[half:], 6.9, 1.7, 5.8, 0.62)
+        else:
+            self._bullets(s, items, 0.9, 1.7, 11.5, 0.62)
+
+    def _bullets(self, s, items, x, y, w, gap=0.62, max_y=7.0):
+        if items:
+            # Shrink the per-item gap so many bullets never overflow the slide.
+            avail = max_y - y
+            gap = min(gap, avail / len(items))
+        for i, it in enumerate(items):
+            yy = y + i * gap
+            # bullet dot
+            self._rect(s, x, yy + 0.12, 0.12, 0.12, self.p["secondary"])
+            # support nested "detail" via "|"
+            if "|" in it:
+                head, detail = it.split("|", 1)
+            else:
+                head, detail = it, ""
+            self._txt(s, x + 0.3, yy, w - 0.3, 0.55, head, size=15,
+                      color=self.p["text"], bold=True)
+            if detail:
+                self._txt(s, x + 0.3, yy + 0.42, w - 0.3, 0.5, detail, size=12,
+                          color=self.p["muted"])
+
+    def two_column(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._rect(s, 0.6, 1.7, 5.9, 4.8, self.p["surface"])
+        self._rect(s, 6.8, 1.7, 5.9, 4.8, self.p["surface"])
+        self._txt(s, 0.9, 1.9, 5.3, 0.5, data.get("left_title", "左栏"),
+                  size=16, bold=True, color=self.p["primary"])
+        self._txt(s, 7.1, 1.9, 5.3, 0.5, data.get("right_title", "右栏"),
+                  size=16, bold=True, color=self.p["primary"])
+        self._bullets(s, data.get("left", []), 0.9, 2.5, 5.3, 0.6)
+        self._bullets(s, data.get("right", []), 7.1, 2.5, 5.3, 0.6)
+
+    def table(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        headers = data.get("headers", [])
+        rows = data.get("rows", [])
+        nrows = len(rows) + 1
+        ncols = max(len(headers), *(len(r) for r in rows) if rows else [1])
+        gtab = s.shapes.add_table(nrows, ncols, Inches(0.6), Inches(1.7),
+                                  Inches(12.1), Inches(4.8)).table
+        gtab.columns  # ensure
+        for j, h in enumerate(headers):
+            cell = gtab.cell(0, j)
+            cell.text = str(h)
+            cell.fill.solid()
+            cell.fill.fore_color.rgb = _c(self.p["primary"])
+            self._cell_font(cell, size=13, bold=True, color="FFFFFF")
+        for i, row in enumerate(rows, 1):
+            for j, val in enumerate(row):
+                cell = gtab.cell(i, j)
+                cell.text = str(val)
+                cell.fill.solid()
+                cell.fill.fore_color.rgb = _c(self.p["surface"] if i % 2 else self.p["bg"])
+                self._cell_font(cell, size=12, color=self.p["text"])
+
+    def _cell_font(self, cell, size=12, bold=False, color="FFFFFF"):
+        tf = cell.text_frame
+        tf.word_wrap = True
+        tf.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
+        for para in tf.paragraphs:
+            para.alignment = PP_ALIGN.LEFT
+            for run in para.runs:
+                run.font.size = Pt(size)
+                run.font.bold = bold
+                run.font.name = self.p["font"]
+                run.font.color.rgb = _c(color)
+
+    def chart(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        ctype = data.get("chart_type", "bar").lower()
+        mapping = {"bar": XL_CHART_TYPE.COLUMN_CLUSTERED,
+                   "column": XL_CHART_TYPE.COLUMN_CLUSTERED,
+                   "line": XL_CHART_TYPE.LINE,
+                   "pie": XL_CHART_TYPE.PIE}
+        chart_data = CategoryChartData()
+        chart_data.categories = data.get("categories", [])
+        for ser in data.get("series", []):
+            chart_data.add_series(ser.get("name", "Series"), ser.get("values", []))
+        gf = s.shapes.add_chart(mapping.get(ctype, XL_CHART_TYPE.COLUMN_CLUSTERED),
+                                Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.6),
+                                chart_data)
+        chart = gf.chart
+        chart.has_legend = len(data.get("series", [])) > 1
+        chart.font.name = self.p["font"]
+        try:
+            chart.font.size = Pt(11)
+        except Exception:
+            pass
+
+    def timeline(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        ms = data.get("milestones", [])
+        if not ms:
+            return
+        y = 4.0
+        self._rect(s, 1.0, y, 11.3, 0.04, self.p["line"])
+        n = len(ms)
+        step = 11.3 / n
+        for i, m in enumerate(ms):
+            cx = 1.0 + step * (i + 0.5)
+            self._rect(s, cx - 0.09, y - 0.07, 0.18, 0.18, self.p["primary"])
+            self._txt(s, cx - 1.2, y - 1.1, 2.4, 0.9, m.get("label", ""),
+                      size=13, bold=True, color=self.p["primary"],
+                      align=PP_ALIGN.CENTER)
+            self._txt(s, cx - 1.2, y + 0.15, 2.4, 1.0, m.get("desc", ""),
+                      size=11, color=self.p["muted"], align=PP_ALIGN.CENTER)
+
+    def quote(self, s, data):
+        self._bg(s)
+        self._txt(s, 1.2, 1.7, 1.5, 1.5, "\u201C", size=120, bold=True,
+                  color=self.p["primary"])
+        self._txt(s, 1.5, 2.3, 10.5, 2.5, data.get("quote", ""), size=26,
+                  italic=True, color=self.p["text"], anchor=MSO_ANCHOR.MIDDLE)
+        if data.get("attribution"):
+            self._txt(s, 1.5, 5.2, 10.5, 0.6, f"— {data['attribution']}",
+                      size=15, color=self.p["secondary"])
+
+    def image(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        path = data.get("image_path", "")
+        x, y, w, h = 1.2, 1.8, 10.9, 4.6
+        if path and os.path.exists(path):
+            s.shapes.add_picture(path, Inches(x), Inches(y), Inches(w), Inches(h))
+        else:
+            self._rect(s, x, y, w, h, self.p["surface"], line=self.p["line"])
+            self._txt(s, x, y + h / 2 - 0.3, w, 0.6,
+                      "[ 图片缺失: %s ]" % path, size=14,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+
+    def summary(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", "总结"))
+        self._bullets(s, data.get("points", []), 0.9, 1.7, 11.5, 0.66)
+        if data.get("conclusion"):
+            self._rect(s, 0.9, 6.0, 11.5, 0.9, self.p["primary"])
+            self._txt(s, 1.1, 6.0, 11.1, 0.9, data["conclusion"], size=15,
+                      bold=True, color="FFFFFF", anchor=MSO_ANCHOR.MIDDLE)
+
+    def bullets(self, s, data):
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"))
+        self._bullets(s, data.get("items", []), 0.9, 1.7, 11.5, 0.66)
+
+    def contact(self, s, data):
+        self._bg(s)
+        self._txt(s, 1, 2.2, 11.3, 1.0, data.get("title", "联系我们"),
+                  size=36, bold=True, color=self.p["primary"],
+                  align=PP_ALIGN.CENTER)
+        self._txt(s, 1, 3.4, 11.3, 1.5, data.get("info", ""), size=16,
+                  color=self.p["text"], align=PP_ALIGN.CENTER)
+
+    # -- dispatch ------------------------------------------------------------
+    RENDERERS = {
+        "cover": cover, "section": section, "agenda": agenda,
+        "content": content, "two_column": two_column, "table": table,
+        "chart": chart, "timeline": timeline, "quote": quote,
+        "image": image, "summary": summary, "bullets": bullets,
+        "contact": contact,
+    }
+
+    def build(self, brief: dict, out_path: str, no_transition: bool = False,
+              seed=None, duration: float = 0.5):
+        style = brief.get("style", "tech_dark")
+        if style not in PALETTES:
+            style = "tech_dark"
+        self.p = PALETTES[style]
+        slides = brief.get("slides", [])
+        total = len(slides)
+        for idx, sl in enumerate(slides, 1):
+            stype = sl.get("type", "content")
+            renderer = self.RENDERERS.get(stype, self.content)
+            s = self._slide()
+            renderer(self, s, sl)
+            # footer + page numbers on non-cover/section pages
+            if stype not in ("cover", "section"):
+                self._footer(s, idx, brief.get("footer", ""),
+                             brief.get("page_numbers", True))
+        os.makedirs(os.path.dirname(os.path.abspath(out_path)), exist_ok=True)
+        self.prs.save(out_path)
+
+        # Best-effort: inject random per-slide page transitions (翻页随机动画).
+        # Uses ppt-master's vetted OOXML transition core via add_transitions.py.
+        transitions = False
+        if not no_transition:
+            try:
+                here = Path(__file__).resolve().parent
+                at = here / "add_transitions.py"
+                if at.exists():
+                    targs = [sys.executable, str(at), out_path,
+                             "--duration", str(duration)]
+                    if seed is not None:
+                        targs += ["--seed", str(seed)]
+                    r = subprocess.run(
+                        targs,
+                        capture_output=True, text=True, encoding="utf-8",
+                    )
+                    transitions = r.returncode == 0
+                    if not transitions:
+                        sys.stderr.write("warning: transitions skipped: "
+                                         + (r.stderr or r.stdout) + "\n")
+            except Exception as e:  # transition is best-effort, never fatal
+                sys.stderr.write("warning: transitions skipped: %s\n" % e)
+        return out_path, transitions
+
+
+def main():
+    ap = argparse.ArgumentParser(description="PPT Pro Studio renderer")
+    ap.add_argument("brief", help="path to brief JSON")
+    ap.add_argument("--out", default="output.pptx", help="output .pptx path")
+    ap.add_argument("--no-transition", action="store_true",
+                    help="skip random page-transition injection")
+    ap.add_argument("--seed", type=int, default=None,
+                    help="random seed for transition effects")
+    ap.add_argument("--transition-duration", type=float, default=0.5)
+    args = ap.parse_args()
+    with open(args.brief, "r", encoding="utf-8") as f:
+        brief = json.load(f)
+    studio = Studio(brief.get("style", "tech_dark"))
+    out, transitions = studio.build(
+        brief, args.out, no_transition=args.no_transition,
+        seed=args.seed, duration=args.transition_duration)
+    print(json.dumps({"ok": True, "file": os.path.abspath(out),
+                      "slides": len(brief.get("slides", [])),
+                      "transitions": transitions,
+                      "engine": "python-pptx (deterministic fallback)",
+                      "style": brief.get("style", "tech_dark")},
+                     ensure_ascii=False))
+
+
+if __name__ == "__main__":
+    main()
