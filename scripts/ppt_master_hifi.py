@@ -258,16 +258,31 @@ class SvgSlide:
         return out
 
     def section(self, d):
+        title = d.get("title", "")
+        num = d.get("index")
+        title_text = title
+        if not num:
+            sp = title.split(" ", 1)
+            if sp[0].isdigit():
+                num = sp[0]
+                title_text = sp[1] if len(sp) > 1 else title
         out = [self._bg(),
-               rect(0, Y(3.1), W, Y(1.3), self.p["surface"]),
-               rect(0, Y(3.1), PX(3), Y(1.3), self.p["primary"])]
-        out.append(self._icon(d.get("icon", "bookmark"), X(0.6), Y(3.28), PX(46)))
-        t, _ = vtext(X(1.7), Y(3.25), d.get("title", ""), PX(34),
-                     self.p["primary"], bold=True, max_w=X(11.0), max_h=Y(1.0))
+               rect(0, Y(2.7), W, Y(2.0), self.p["surface"]),
+               rect(0, Y(2.7), PX(3), Y(2.0), self.p["primary"]),
+               line(X(3.4), Y(2.9), X(3.4), Y(4.5), self.p["line"], 1),
+               f'<circle cx="{X(11.9):.1f}" cy="{Y(3.7):.1f}" r="{PX(46):.1f}" '
+               f'fill="none" stroke="#{self.p["primary"]}" stroke-width="2" '
+               f'opacity="0.5"/>']
+        if num:
+            out.append(_text(X(2.0), Y(3.15), num, PX(96), self.p["accent"],
+                             bold=True, align="center"))
+        tx = X(3.7) if num else X(1.7)
+        t, _ = vtext(tx, Y(2.95), title_text, PX(34), self.p["primary"],
+                     bold=True, max_w=X(7.7), max_h=Y(1.2))
         out.append(t)
         if d.get("subtitle"):
-            s, _ = vtext(X(1.7), Y(4.3), d["subtitle"], PX(14), self.p["muted"],
-                         max_w=X(11.0), max_h=Y(0.5))
+            s, _ = vtext(tx, Y(4.25), d["subtitle"], PX(14), self.p["muted"],
+                         max_w=X(7.7), max_h=Y(0.5))
             out.append(s)
         return out
 
@@ -368,51 +383,87 @@ class SvgSlide:
         cats = d.get("categories", [])
         series = d.get("series", [])
         if not cats or not series:
+            out.append(_text(W / 2, Y(4), "[ 无图表数据 ]", PX(14),
+                             self.p["muted"], align="center"))
             return out
+        emphasis = d.get("emphasis", [])
+        if isinstance(emphasis, int):
+            emphasis = [emphasis]
+        ser_colors = [self.p["primary"], self.p["secondary"], self.p["accent"],
+                      self.p["muted"]]
+
+        def color_for(si):
+            return ser_colors[si % len(ser_colors)]
+
         values = [v for s in series for v in s.get("values", [])]
         vmax = max(values) if values else 1
-        vmax = vmax if vmax > 0 else 1
+        vmax = max(vmax, 1)
+        # plot frame
         px0, py0 = X(0.9), Y(1.9)
         pw, ph = X(11.5), Y(4.4)
+        base = py0 + ph
+        # horizontal gridlines + y-axis value labels (4 intervals)
+        ng = 4
+        for g in range(ng + 1):
+            gy = base - (ph * g / ng)
+            out.append(line(px0, gy, px0 + pw, gy, self.p["line"], 1))
+            gv = vmax * g / ng
+            out.append(_text(px0 - X(0.12), gy + PX(4), f"{gv:g}",
+                             PX(11), self.p["muted"], align="right"))
         if ctype in ("bar", "horizontal"):
             n = len(cats)
-            bh = ph / n * 0.62
+            bh = ph / n * 0.6
             gap = ph / n
             for i, c in enumerate(cats):
                 yy = py0 + i * gap + (gap - bh) / 2
-                out.append(_text(px0, yy + bh * 0.2, c, PX(12), self.p["muted"]))
-                bw = (series[0]["values"][i] / vmax) * (pw - X(2.2))
-                out.append(rect(px0 + X(1.6), yy, max(bw, 1), bh, self.p["primary"], rx=2))
-                out.append(_text(px0 + X(1.6) + bw + X(0.1), yy + bh * 0.18,
-                                 str(series[0]["values"][i]), PX(11), self.p["secondary"]))
+                out.append(_text(px0, yy + bh * 0.25, c, PX(12), self.p["text"]))
+                bw = (series[0]["values"][i] / vmax) * (pw - X(2.4))
+                col = self.p["accent"] if i in emphasis else self.p["primary"]
+                out.append(rect(px0 + X(1.9), yy, max(bw, 1), bh, col, rx=2))
+                out.append(_text(px0 + X(1.9) + bw + X(0.1), yy + bh * 0.22,
+                                 str(series[0]["values"][i]), PX(11),
+                                 self.p["secondary"]))
         elif ctype in ("line",):
             n = len(cats)
             step = (pw - X(1.0)) / max(n - 1, 1)
             x0 = px0 + X(0.5)
-            pts = []
-            for i, v in enumerate(series[0]["values"]):
-                cx = x0 + i * step
-                cy = py0 + ph - (v / vmax) * ph
-                pts.append((cx, cy))
-            poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
-            out.append(f'<polyline points="{poly}" fill="none" stroke="#{self.p["secondary"]}" stroke-width="2.5"/>')
-            for x, y in pts:
-                out.append(circle(x, y, 4, self.p["primary"]))
+            for si, ser in enumerate(series):
+                pts = []
+                for i, v in enumerate(ser.get("values", [])):
+                    cx = x0 + i * step
+                    cy = base - (v / vmax) * ph
+                    pts.append((cx, cy))
+                poly = " ".join(f"{x:.1f},{y:.1f}" for x, y in pts)
+                col = color_for(si)
+                out.append(f'<polyline points="{poly}" fill="none" '
+                           f'stroke="#{col}" stroke-width="2.5"/>')
+                for i, (x, y) in enumerate(pts):
+                    pc = self.p["accent"] if i in emphasis else col
+                    out.append(circle(x, y, 4, pc))
+                    if i in emphasis or (si == 0 and i == len(pts) - 1):
+                        out.append(_text(x, y - PX(10), str(ser["values"][i]),
+                                         PX(11), self.p["text"], align="center"))
             for i, c in enumerate(cats):
-                out.append(_text(x0 + i * step, py0 + ph + PX(16), c, PX(11),
+                out.append(_text(x0 + i * step, base + PX(16), c, PX(11),
                                  self.p["muted"], align="center"))
-        else:  # column / default
+        else:  # column clustered (default), multi-series aware
             n = len(cats)
+            m = len(series)
             slot = (pw - X(0.5)) / n
-            bw = slot * 0.6
-            base = py0 + ph
-            for i, v in enumerate(series[0]["values"]):
-                bh = (v / vmax) * (ph - PX(20))
-                cx = px0 + X(0.3) + i * slot + (slot - bw) / 2
-                out.append(rect(cx, base - bh, bw, bh, self.p["primary"], rx=2))
-                out.append(_text(cx + bw / 2, base - bh - PX(4), str(v), PX(11),
-                                 self.p["secondary"], align="center"))
-                out.append(_text(cx + bw / 2, base + PX(6), cats[i], PX(11),
+            group_w = slot * 0.7
+            bar_w = group_w / m * 0.82
+            for i, c in enumerate(cats):
+                gx = px0 + X(0.3) + i * slot + (slot - group_w) / 2
+                for si, ser in enumerate(series):
+                    vals = ser.get("values", [])
+                    v = vals[i] if i < len(vals) else 0
+                    bh = (v / vmax) * (ph - PX(20))
+                    bx = gx + si * (group_w / m) + (group_w / m - bar_w) / 2
+                    col = self.p["accent"] if i in emphasis else color_for(si)
+                    out.append(rect(bx, base - bh, bar_w, bh, col, rx=2))
+                    out.append(_text(bx + bar_w / 2, base - bh - PX(4), str(v),
+                                     PX(11), self.p["secondary"], align="center"))
+                out.append(_text(gx + group_w / 2, base + PX(6), c, PX(11),
                                  self.p["muted"], align="center"))
         return out
 

@@ -25,7 +25,7 @@ from pptx.dml.color import RGBColor
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR, MSO_AUTO_SIZE
 from pptx.enum.shapes import MSO_SHAPE
 from pptx.chart.data import CategoryChartData
-from pptx.enum.chart import XL_CHART_TYPE
+from pptx.enum.chart import XL_CHART_TYPE, XL_LEGEND_POSITION, XL_LABEL_POSITION
 from pptx.oxml.ns import qn
 
 try:
@@ -212,6 +212,30 @@ class Studio:
         except Exception as e:  # theme is best-effort, never fatal
             sys.stderr.write("warning: master theme skipped: %s\n" % e)
 
+    def _transparent_chart(self, chart):
+        """Make the chart plot area transparent so the brand slide background
+        shows through (no white box on dark themes). Standard OOXML patch,
+        WPS-safe. Best-effort, never fatal."""
+        try:
+            from pptx.oxml.ns import qn
+            cs = chart._chartSpace
+            el = cs.find(qn("c:plotArea"))
+            if el is None:
+                return
+            spPr = el.find(qn("c:spPr"))
+            if spPr is None:
+                spPr = el.makeelement(qn("c:spPr"), {})
+                el.insert(0, spPr)
+            for child in list(spPr):
+                if child.tag in (qn("a:solidFill"), qn("a:gradFill"),
+                                 qn("a:blipFill"), qn("a:pattFill"),
+                                 qn("a:grpFill")):
+                    spPr.remove(child)
+            if spPr.find(qn("a:noFill")) is None:
+                spPr.append(spPr.makeelement(qn("a:noFill"), {}))
+        except Exception:
+            pass
+
     def _icon(self, slide, name, x, y, size, color):
         try:
             add_icon_to_slide(slide, name, x, y, size, color, stroke_w_pt=1.5)
@@ -315,15 +339,37 @@ class Studio:
 
     def section(self, s, data):
         self._bg(s)
-        self._rect(s, 0, 3.1, 13.333, 1.3, self.p["surface"])
-        self._rect(s, 0, 3.1, 0.18, 1.3, self.p["primary"])
-        self._icon(s, data.get("icon", "bookmark"), 0.6, 3.28, 0.9,
-                   self.p["primary"])
-        self._txt(s, 1.7, 3.25, 11.0, 1.0, data.get("title", ""),
-                  size=34, bold=True, color=self.p["primary"],
-                  anchor=MSO_ANCHOR.MIDDLE)
+        title = data.get("title", "")
+        num = data.get("index") or data.get("num")
+        title_text = title
+        if not num:
+            sp = title.split(" ", 1)
+            if sp[0].isdigit():
+                num = sp[0]
+                title_text = sp[1] if len(sp) > 1 else title
+        # Band + accent edge
+        self._rect(s, 0, 2.7, 13.333, 2.0, self.p["surface"])
+        self._rect(s, 0, 2.7, 0.18, 2.0, self.p["primary"])
+        # Vertical divider separating the big index from the title
+        self._rect(s, 3.4, 2.9, 0.02, 1.6, self.p["line"])
+        # Big index number (narrative rhythm)
+        if num:
+            self._txt(s, 0.6, 2.7, 2.6, 2.0, num, size=96, bold=True,
+                      color=self.p["accent"], align=PP_ALIGN.CENTER,
+                      anchor=MSO_ANCHOR.MIDDLE)
+        # Geometric ring decoration (right)
+        ring = s.shapes.add_shape(MSO_SHAPE.OVAL, Inches(11.3), Inches(2.95),
+                                  Inches(1.3), Inches(1.3))
+        ring.fill.background()
+        ring.line.color.rgb = _c(self.p["primary"])
+        ring.line.width = Pt(1.5)
+        ring.shadow.inherit = False
+        # Title + subtitle (right of the divider)
+        tx = 3.7 if num else 1.7
+        self._txt(s, tx, 2.95, 7.4, 1.0, title_text, size=34, bold=True,
+                  color=self.p["primary"], anchor=MSO_ANCHOR.MIDDLE)
         if data.get("subtitle"):
-            self._txt(s, 1.7, 4.25, 11.0, 0.5, data["subtitle"], size=14,
+            self._txt(s, tx, 4.35, 7.4, 0.5, data["subtitle"], size=14,
                       color=self.p["muted"])
 
     def agenda(self, s, data):
@@ -430,7 +476,7 @@ class Studio:
         ctype = data.get("chart_type", "bar").lower()
         mapping = {"bar": XL_CHART_TYPE.COLUMN_CLUSTERED,
                    "column": XL_CHART_TYPE.COLUMN_CLUSTERED,
-                   "line": XL_CHART_TYPE.LINE,
+                   "line": XL_CHART_TYPE.LINE_MARKERS,
                    "pie": XL_CHART_TYPE.PIE}
         chart_data = CategoryChartData()
         chart_data.categories = data.get("categories", [])
@@ -440,10 +486,78 @@ class Studio:
                                 Inches(0.8), Inches(1.8), Inches(11.7), Inches(4.6),
                                 chart_data)
         chart = gf.chart
-        chart.has_legend = len(data.get("series", [])) > 1
-        chart.font.name = self.p["font"]
+        # Transparent chart/plot area so the brand background shows through.
         try:
-            chart.font.size = Pt(11)
+            chart.fill.background()
+            chart.plot_area.fill.background()
+        except Exception:
+            pass
+        self._transparent_chart(chart)
+        # Legend: only when >1 series, placed at the bottom, theme-colored.
+        chart.has_legend = len(data.get("series", [])) > 1
+        if chart.has_legend:
+            chart.legend.position = XL_LEGEND_POSITION.BOTTOM
+            chart.legend.include_in_layout = False
+            chart.legend.font.size = Pt(10)
+            chart.legend.font.name = self.p["font"]
+            chart.legend.font.color.rgb = _c(self.p["text"])
+        chart.font.name = self.p["font"]
+        chart.font.size = Pt(11)
+        chart.font.color.rgb = _c(self.p["text"])
+        # Axes: gridlines + theme-colored tick labels for readable contrast.
+        try:
+            val = chart.value_axis
+            val.has_major_gridlines = True
+            val.major_gridlines.format.line.color.rgb = _c(self.p["line"])
+            val.major_gridlines.format.line.width = Pt(0.5)
+            val.tick_labels.font.size = Pt(10)
+            val.tick_labels.font.color.rgb = _c(self.p["muted"])
+            val.has_title = False
+            cat = chart.category_axis
+            cat.tick_labels.font.size = Pt(11)
+            cat.tick_labels.font.color.rgb = _c(self.p["text"])
+        except Exception:
+            pass
+        # Series colors (distinct), data labels, and single-point emphasis.
+        series_colors = [self.p["primary"], self.p["secondary"], self.p["accent"]]
+        emphasis = data.get("emphasis", [])
+        if isinstance(emphasis, int):
+            emphasis = [emphasis]
+        try:
+            plot = chart.plots[0]
+            plot.has_data_labels = True
+            plot.data_labels.number_format = "0"
+            plot.data_labels.number_format_is_linked = False
+            plot.data_labels.font.size = Pt(10)
+            plot.data_labels.font.name = self.p["font"]
+            plot.data_labels.font.color.rgb = _c(self.p["text"])
+            if ctype == "pie":
+                plot.data_labels.show_percentage = True
+                plot.data_labels.show_category_name = False
+                plot.data_labels.show_value = False
+            elif ctype != "line":
+                plot.data_labels.position = XL_LABEL_POSITION.OUTSIDE_END
+            for si, ser in enumerate(chart.series):
+                col = series_colors[si % len(series_colors)]
+                if ctype == "line":
+                    try:
+                        ser.format.line.color.rgb = _c(col)
+                        ser.format.line.width = Pt(2.25)
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        ser.format.fill.solid()
+                        ser.format.fill.fore_color.rgb = _c(col)
+                    except Exception:
+                        pass
+                try:
+                    for pi in emphasis:
+                        pt = ser.points[pi]
+                        pt.format.fill.solid()
+                        pt.format.fill.fore_color.rgb = _c(self.p["accent"])
+                except Exception:
+                    pass
         except Exception:
             pass
 

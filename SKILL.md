@@ -123,6 +123,11 @@ python3 scripts/ppt_studio_generate.py brief.json --out deliverable_fallback.ppt
 - [ ] 翻页动画已注入（主路径默认开启）
 - [ ] 无水印、无外部服务依赖、可离线打开
 
+**QA 2.0 排版校验（推荐，程序化）**：渲染后跑
+`python3 scripts/qa2.py deliverable.pptx [--json report.json]`，自动审计
+边界越界、占位符残留、正文≥11pt 字号下限、翻页动画、矢量图标数量、母版品牌
+主题一致性，并给出 0–100 评分。零 error 级问题即通过。
+
 MCP 用户可调用 `qa_check` 工具做程序化校验（页数、空页、占位符扫描）。
 
 ### ⑧ 精修 / ⑨ 导出交付

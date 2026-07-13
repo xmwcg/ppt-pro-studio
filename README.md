@@ -17,6 +17,7 @@
 | `scripts/ppt_master_hifi.py` | **Primary** renderer: brief → high-fidelity SVG → ppt-master `svg_to_pptx` → native `.pptx` + random page transitions. Wraps the highest-starred PPTX skill (hugohe3/ppt-master, 16.6k★, MIT). |
 | `scripts/ppt_studio_generate.py` | **Fallback** deterministic python-pptx renderer. 5 palettes, 12 slide types, native charts, overflow-safe auto-fit. |
 | `scripts/add_transitions.py` | Injects random per-slide transitions via ppt-master's OOXML transition core. |
+| `scripts/qa2.py` | QA 2.0 layout audit: bounds, placeholders, font floor (≥11pt), transitions, icons, brand theme, score. |
 | `vendor/ppt-master-scripts/` | Bundled ppt-master converter + transition core (offline, MIT). |
 | `mcp-server/ppt-studio-mcp.js` | Zero-dependency MCP server (stdio). Tools: `generate_ppt`, `qa_check`, `list_styles`. |
 | `references/prompt-refiner-PROMPT.md` | The mandatory first-step prompt-enhancer (MIT, from xie-maker/prompt-refiner-skill). |

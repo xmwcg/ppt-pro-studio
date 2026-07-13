@@ -33,9 +33,13 @@
     {
       "type": "chart",
       "title": "市场规模 (亿美元)",
-      "chart_type": "bar",
+      "chart_type": "column",
       "categories": ["2024", "2025", "2026E", "2027E"],
-      "series": [{ "name": "企业 Agent 市场", "values": [120, 280, 540, 960] }]
+      "series": [
+        { "name": "企业 Agent 市场", "values": [120, 280, 540, 960] },
+        { "name": "通用 Agent 市场", "values": [200, 420, 760, 1280] }
+      ],
+      "emphasis": [3]
     },
     {
       "type": "section",
