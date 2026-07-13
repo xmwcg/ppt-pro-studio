@@ -1,0 +1,94 @@
+{
+  "title": "AI Agent 平台商业计划",
+  "subtitle": "2026 投资人路演版",
+  "style": "tech_dark",
+  "footer": "Reasonix AI · 机密",
+  "page_numbers": true,
+  "slides": [
+    {
+      "type": "cover",
+      "title": "AI Agent 平台商业计划",
+      "subtitle": "一站式 AI Agent 商业平台 · 知识管理 · 智能工具 · 团队协作",
+      "badge": "2026 投资人路演 · 免费开源可商用"
+    },
+    {
+      "type": "agenda",
+      "title": "目录",
+      "items": ["市场机会", "产品矩阵", "商业模式", "增长路线", "团队与融资"]
+    },
+    {
+      "type": "section",
+      "title": "01 市场机会",
+      "subtitle": "企业智能体需求爆发"
+    },
+    {
+      "type": "content",
+      "title": "为什么是现在",
+      "items": [
+        "企业知识孤岛严重 | 80% 内部文档无法被检索调用",
+        "人工流程成本高 | 重复性办公任务占工时 40%+",
+        "大模型能力成熟 | 多模态 + 长上下文让 Agent 可落地"
+      ]
+    },
+    {
+      "type": "chart",
+      "title": "市场规模 (亿美元)",
+      "chart_type": "bar",
+      "categories": ["2024", "2025", "2026E", "2027E"],
+      "series": [{ "name": "企业 Agent 市场", "values": [120, 280, 540, 960] }]
+    },
+    {
+      "type": "section",
+      "title": "02 产品矩阵",
+      "subtitle": "四层一体化平台"
+    },
+    {
+      "type": "two_column",
+      "title": "产品矩阵",
+      "left_title": "能力层",
+      "right_title": "交付层",
+      "left": ["知识中枢 RAG", "多模型调度", "MCP 插件市场", "技能编排"],
+      "right": ["AI 对话框", "学习中心", "创作工坊", "企业版 RBAC"]
+    },
+    {
+      "type": "timeline",
+      "title": "增长路线",
+      "milestones": [
+        { "label": "P1 MVP", "desc": "知识库+对话+RAG" },
+        { "label": "P2 生态", "desc": "学习路径+MCP" },
+        { "label": "P3 企业", "desc": "知识图谱+沙盒" },
+        { "label": "P4 桌面", "desc": "Tauri+出海" }
+      ]
+    },
+    {
+      "type": "table",
+      "title": "商业模式对比",
+      "headers": ["层级", "对象", "ARPU", "毛利"],
+      "rows": [
+        ["免费", "个人", "0", "-"],
+        ["会员", "专业用户", "¥99/月", "85%"],
+        ["企业", "团队", "¥1999/席/年", "90%"]
+      ]
+    },
+    {
+      "type": "quote",
+      "quote": "让每个企业都有自己的 AI 员工，从一份知识库开始。",
+      "attribution": "Reasonix AI 使命"
+    },
+    {
+      "type": "summary",
+      "title": "总结",
+      "points": [
+        "市场窗口已打开，先发优势关键",
+        "知识中枢是壁垒，MCP 生态是杠杆",
+        "三层变现，企业版是高毛利引擎"
+      ],
+      "conclusion": "本轮融资用于模型日历与海外合规，18 个月做到 10 万付费。"
+    },
+    {
+      "type": "contact",
+      "title": "联系我们",
+      "info": "invest@reasonix.ai · 微信 aibak2026"
+    }
+  ]
+}
