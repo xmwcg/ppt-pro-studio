@@ -1,0 +1,41 @@
+{
+  "label": "医疗科普 (Medical Science)",
+  "description": "健康/医学科普：概念→原理→建议",
+  "theme": "medical_blue",
+  "narrative": "teach",
+  "delivery": "editable",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "科普主题"
+    },
+    {
+      "type": "section",
+      "title": "学习目标"
+    },
+    {
+      "type": "content",
+      "title": "核心概念",
+      "items": [
+        "概念一",
+        "概念二"
+      ]
+    },
+    {
+      "type": "content",
+      "title": "发生原理",
+      "items": [
+        "机制一",
+        "机制二"
+      ]
+    },
+    {
+      "type": "media",
+      "title": "图示 / 案例"
+    },
+    {
+      "type": "summary",
+      "title": "健康建议"
+    }
+  ]
+}

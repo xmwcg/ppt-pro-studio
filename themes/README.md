@@ -14,6 +14,10 @@ Each file is a standalone, editable theme. Engines load every `*.json` here at r
 | `fintech_green` | 金融绿 (Fintech Green) | #2EA66B | #F2B705 | #0B1F17 |
 | `sunset_orange` | 暖阳橙 (Sunset Orange) | #E8843C | #5BC0EB | #1A1206 |
 | `mono_ink` | 极简墨 (Mono Ink) | #FFFFFF | #FF4D4D | #0A0A0A |
+| `guochao_red` | 国潮红 (Guochao Red) | #C8102E | #E8B04B | #1A0808 |
+| `medical_blue` | 医疗蓝 (Medical Blue) | #0B6E9E | #2EA66B | #F4F9FC |
+| `ecommerce_orange` | 电商橙 (E-commerce Orange) | #FF6A00 | #FFC400 | #FFF7F0 |
+| `gov_red` | 党政红 (Official Red) | #C8102E | #D4AF37 | #FFFFFF |
 
 ## Add your own
 

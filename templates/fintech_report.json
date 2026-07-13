@@ -1,0 +1,41 @@
+{
+  "label": "金融研报 (Fintech Report)",
+  "description": "行业/数据研报：摘要→数据→结论",
+  "theme": "fintech_green",
+  "narrative": "inform",
+  "delivery": "editable",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "研报标题"
+    },
+    {
+      "type": "section",
+      "title": "摘要"
+    },
+    {
+      "type": "chart",
+      "title": "核心数据"
+    },
+    {
+      "type": "content",
+      "title": "趋势判断",
+      "items": [
+        "判断一",
+        "判断二"
+      ]
+    },
+    {
+      "type": "two_column",
+      "title": "风险与机会",
+      "items": [
+        "风险",
+        "机会"
+      ]
+    },
+    {
+      "type": "summary",
+      "title": "投资建议"
+    }
+  ]
+}

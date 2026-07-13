@@ -1,6 +1,6 @@
 /* PPT Master - Strategist confirmation stage UI
- * Finite/enumerable fields (canvas, mode, visual style, template adherence,
- * icons, image usage, AI source, formula policy, generation mode) list ALL options from
+ * Finite/enumerable fields (canvas, mode, visual style, icons, image usage,
+ * AI source, formula policy, generation mode) list ALL options from
  * /static/catalogs.json with the AI's recommendation marked. Open/generative
  * fields (color, typography, generated-image style) show >=3 AI candidates. Open fields also expose
  * Custom controls. On confirm the page saves result.json and closes.
@@ -21,7 +21,6 @@
             btn_confirm: "Confirm",
             btn_next: "Next →",
             deriving: "Generating the downstream options from your choices…",
-            connection_lost: "Connection to the confirm server was interrupted; retrying. If this keeps failing, return to the chat for confirmation.",
             already_confirmed: "Already confirmed once. Re-submitting overwrites the previous choices.",
             confirmed_title: "✓ Confirmed",
             confirmed_hint: "Your choices are saved. You can close this page and return to the chat.",
@@ -38,7 +37,6 @@
             sec_refine: "Refine spec first",
             sub_mode: "Narrative mode",
             sub_visual: "Visual style",
-            sub_template_adherence: "Template adherence",
             sub_divergence: "Material divergence (how freely to reshape vs. stay close to the source)",
             placeholder_divergence: "In your words — e.g. \"stick closely to the document\" / \"freely restructure and expand within the source\". Leave blank for a balanced default.",
             custom: "Custom",
@@ -58,8 +56,6 @@
             image_strategy_mood: "Mood",
             image_strategy_manual: "Custom",
             image_strategy_manual_desc: "Choose a rendering and palette manually, or use custom prose.",
-            image_strategy_custom_prompt: "Custom prompt notes",
-            image_strategy_custom_placeholder: "Describe the exact generated-image direction, subjects, composition, style cues, or things to avoid.",
             image_strategy_reference_hint: "Reference images show rendering / color-behavior only. Final AI images use the color scheme selected above.",
             image_strategy_color_follow: "Uses the color scheme selected above; the palette only controls color behavior.",
             image_strategy_no_reference: "No reference image for this custom choice.",
@@ -71,9 +67,6 @@
             font_body: "Body",
             font_body_size: "Body baseline size",
             font_body_size_hint: "All type sizes derive from this body baseline.",
-            body_size_unit_relation: "SVG px to PPT pt: 1px = 0.75pt.",
-            body_size_pt_hint: "Approximately {pt} pt (1px = 0.75pt; saved as px).",
-            role_size_pt_hint: "≈ {pt} pt",
             body_size_hint_canvas: "This canvas suggests ~{lo}–{hi}px (scales with canvas height).",
             body_size_hint_purpose: "This delivery purpose recommends {def}px — one fixed size, not a range.",
             body_size_hint_oor: "(Current value is outside the usual range for this canvas — check the unit is right and that it fits.)",
@@ -133,7 +126,6 @@
             btn_confirm: "確定",
             btn_next: "次へ →",
             deriving: "選択内容をもとに後続の選択肢を生成しています…",
-            connection_lost: "確認ページのサーバー接続が中断されました。再試行しています。失敗が続く場合はチャットで確認してください。",
             already_confirmed: "すでに一度確定済みです。再送信すると前回の選択を上書きします。",
             confirmed_title: "✓ 確定しました",
             confirmed_hint: "選択内容を保存しました。このページを閉じてチャットに戻ってください。",
@@ -150,7 +142,6 @@
             sec_refine: "先に設計仕様を精査",
             sub_mode: "ナラティブモード",
             sub_visual: "ビジュアルスタイル",
-            sub_template_adherence: "テンプレートの適用方法",
             sub_divergence: "素材からの発散度（どこまで自由に再構成するか、原文に忠実か）",
             placeholder_divergence: "自分の言葉でどうぞ — 例：「文書に忠実に」「元素材の範囲内で自由に再構成・展開」。空欄ならバランス型になります。",
             custom: "カスタム",
@@ -170,8 +161,6 @@
             image_strategy_mood: "ムード",
             image_strategy_manual: "カスタム",
             image_strategy_manual_desc: "レンダリングとパレットを手動で選ぶか、カスタム記述を使います。",
-            image_strategy_custom_prompt: "カスタム指示",
-            image_strategy_custom_placeholder: "生成画像の方向性、被写体、構図、スタイル要素、避けたい要素を具体的に入力してください。",
             image_strategy_reference_hint: "参照画像はレンダリング／色の使い方だけを示します。最終AI画像の色は上で選んだ配色に従います。",
             image_strategy_color_follow: "上で選んだ配色を使用します。パレットは色の使い方だけを制御します。",
             image_strategy_no_reference: "このカスタム選択には参照画像がありません。",
@@ -183,9 +172,6 @@
             font_body: "本文",
             font_body_size: "本文の基準サイズ",
             font_body_size_hint: "すべての文字サイズはこの本文基準から導出されます。",
-            body_size_unit_relation: "SVG px と PPT pt の換算：1px = 0.75pt。",
-            body_size_pt_hint: "約 {pt} pt（1px = 0.75pt 換算、保存は px）。",
-            role_size_pt_hint: "約 {pt} pt",
             body_size_hint_canvas: "このキャンバスの目安は約{lo}–{hi}px（キャンバスの高さに応じて変化）。",
             body_size_hint_purpose: "この利用シーンの推奨は{def}px — 範囲ではなく固定値です。",
             body_size_hint_oor: "（現在の値はこのキャンバスの通常範囲外です — 単位とサイズ感を確認してください。）",
@@ -245,7 +231,6 @@
             btn_confirm: "确认",
             btn_next: "下一步 →",
             deriving: "正在根据你的选择生成下游选项…",
-            connection_lost: "确认页服务连接中断，正在重试；如果持续失败，请回到聊天窗口走聊天确认。",
             already_confirmed: "已确认过一次，重新提交会覆盖之前的选择。",
             confirmed_title: "✓ 已确认",
             confirmed_hint: "选择已保存，可关闭此页并回到聊天窗口。",
@@ -262,7 +247,6 @@
             sec_refine: "先精修设计规范",
             sub_mode: "叙事模式",
             sub_visual: "视觉风格",
-            sub_template_adherence: "模板遵循方式",
             sub_divergence: "材料发散度（多大程度重塑，还是贴近源材料）",
             placeholder_divergence: "用你自己的话写，例如「严格贴着文档来」/「在源材料范围内自由重组并展开」。留空则按平衡处理。",
             custom: "自定义",
@@ -282,8 +266,6 @@
             image_strategy_mood: "情绪",
             image_strategy_manual: "自定义",
             image_strategy_manual_desc: "手动选择渲染风格和图像调色，也可以使用自定义描述。",
-            image_strategy_custom_prompt: "自定义提示要求",
-            image_strategy_custom_placeholder: "描述生成图的具体方向、主体、构图、风格关键词或需要避免的内容。",
             image_strategy_reference_hint: "参考图只展示渲染风格 / 用色行为；最终 AI 图片颜色跟随上方色彩方案。",
             image_strategy_color_follow: "使用上方已选色彩方案；图像调色只控制用色比例和行为。",
             image_strategy_no_reference: "自定义选择没有参考图。",
@@ -295,9 +277,6 @@
             font_body: "正文",
             font_body_size: "正文基准字号",
             font_body_size_hint: "所有字号按这个正文基准推导。",
-            body_size_unit_relation: "SVG px 与 PPT pt 的换算：1px = 0.75pt。",
-            body_size_pt_hint: "约 {pt} pt（按 1px = 0.75pt 换算；提交仍保存 px）。",
-            role_size_pt_hint: "约 {pt} pt",
             body_size_hint_canvas: "当前画布建议 ~{lo}–{hi}px（随画布高度缩放）。",
             body_size_hint_purpose: "该交付目的推荐 {def}px（单一固定值，非区间）。",
             body_size_hint_oor: "（当前数值超出该画布的常用范围——请确认单位无误、是否合适。）",
@@ -722,15 +701,6 @@
     function recValue(field) {
         return (REC && REC.recommend && REC.recommend[field]) || legacyRecId(field);
     }
-
-    function hasTemplateAdherence() {
-        if (!REC) return false;
-        if (typeof REC._template_adherence_enabled === "boolean") {
-            return REC._template_adherence_enabled;
-        }
-        if (REC.recommend && REC.recommend.template_adherence != null) return true;
-        return REC.template_adherence != null;
-    }
     // Guaranteed recommendation: the AI's pick, or the first catalog option as a
     // fallback so an enumerable field ALWAYS shows a badged recommendation.
     function recOrFirst(field, list) {
@@ -1066,15 +1036,6 @@
             function () { return STATE.visual_style; }, function (v) { STATE.visual_style = v; refreshDirectionPreview(); },
             { allowCustom: true, spectrum: REC && REC.visual_style_spectrum });
         sec.appendChild(sub2);
-        if (hasTemplateAdherence()) {
-            var templateField = el("div", "subfield");
-            templateField.appendChild(el("div", "subfield-label", t("sub_template_adherence")));
-            enumField(templateField, CAT.template_adherence,
-                recOrFirst("template_adherence", CAT.template_adherence),
-                function () { return STATE.template_adherence; },
-                function (v) { STATE.template_adherence = v; });
-            sec.appendChild(templateField);
-        }
         host.appendChild(sec);
     }
 
@@ -1175,13 +1136,6 @@
 
     function roundSize(value) {
         return Math.round(value * 100) / 100;
-    }
-
-    function formatPtFromPx(value) {
-        var px = parseFloat(value);
-        if (!isFinite(px)) return "";
-        var pt = Math.round(px * 0.75 * 10) / 10;
-        return pt % 1 === 0 ? String(Math.round(pt)) : String(pt);
     }
 
     function normalizeTypographyForSubmit(payload) {
@@ -1438,7 +1392,6 @@
 
         var sizeField = el("div", "subfield");
         sizeField.appendChild(el("div", "subfield-label", t("font_body_size")));
-        sizeField.appendChild(el("div", "toggle-desc body-size-relation", t("body_size_unit_relation")));
         var sizeRow = el("div", "font-size-row");
         var sizeInput = el("input", "num-input font-size-input");
         sizeInput.type = "number";
@@ -1456,9 +1409,8 @@
             refreshStylePreview();
         });
         sizeRow.appendChild(sizeInput);
-        sizeRow.appendChild(el("span", "font-size-unit", "px"));
-        var sizePtHint = el("div", "toggle-desc body-size-pt");
-        var sizeHint = el("div", "toggle-desc body-size-hint");
+        var sizeHint = el("div", "toggle-desc");
+        sizeRow.appendChild(sizeHint);
         // Hint only — the user's value is never overwritten; downstream §g
         // re-derives if ignored. PPT body is one fixed px value per delivery
         // purpose (not a range); non-PPT canvases scale px to canvas height.
@@ -1483,9 +1435,6 @@
             // canvas's usual px range, so an accidental extreme value is visible
             // instead of silently submitting it.
             var cur = parseFloat(STATE.typography && STATE.typography.body_size);
-            sizePtHint.textContent = isFinite(cur)
-                ? t("body_size_pt_hint").replace("{pt}", formatPtFromPx(cur))
-                : "";
             if (isFinite(cur) && isFinite(lo) && isFinite(hi) && (cur < lo || cur > hi)) {
                 txt += " " + t("body_size_hint_oor");
             }
@@ -1493,8 +1442,6 @@
         };
         refreshBodySizeHint();
         sizeField.appendChild(sizeRow);
-        sizeField.appendChild(sizePtHint);
-        sizeField.appendChild(sizeHint);
 
         // Delivery purpose is a Stage-1 anchor confirmed inside renderAudience (§c) —
         // it is set before this Stage-2 section exists, so its value drives the
@@ -1509,18 +1456,9 @@
         sizeOverride.appendChild(el("div", "subfield-label", t("size_override")));
         var srow = el("div", "hex-row");
         var sizeInputs = {};
-        var sizePtHints = {};
-        function refreshRolePtHint(role) {
-            var input = sizeInputs[role];
-            var hint = sizePtHints[role];
-            if (!input || !hint) return;
-            var pt = formatPtFromPx(input.value);
-            hint.textContent = pt ? t("role_size_pt_hint").replace("{pt}", pt) : "";
-        }
         SIZE_ROLES.forEach(function (role) {
             var wrap = el("div", "hex-cell");
             wrap.appendChild(el("div", "hex-cell-label", t("size_role_" + role)));
-            var inputLine = el("div", "role-size-line");
             var inp = document.createElement("input");
             inp.type = "number"; inp.min = "6"; inp.max = "200"; inp.step = "1";
             inp.addEventListener("input", function () {
@@ -1528,16 +1466,10 @@
                 if (!STATE.typography.sizes) STATE.typography.sizes = {};
                 // Independent input — each role holds its own value; no cascade.
                 STATE.typography.sizes[role] = inp.value;
-                refreshRolePtHint(role);
                 refreshStylePreview();
             });
             sizeInputs[role] = inp;
-            inputLine.appendChild(inp);
-            inputLine.appendChild(el("span", "font-size-unit", "px"));
-            wrap.appendChild(inputLine);
-            sizePtHints[role] = el("div", "role-size-pt");
-            wrap.appendChild(sizePtHints[role]);
-            srow.appendChild(wrap);
+            wrap.appendChild(inp); srow.appendChild(wrap);
         });
         sizeOverride.appendChild(srow);
         sec.appendChild(sizeOverride);
@@ -1557,7 +1489,6 @@
                 var hasVal = cur !== undefined && cur !== null && cur !== "";
                 if (!hasVal) STATE.typography.sizes[role] = deriveSize(role, bodyVal);
                 if (sizeInputs[role]) sizeInputs[role].value = STATE.typography.sizes[role];
-                refreshRolePtHint(role);
             });
         };
         refreshSizeInputs();
@@ -1721,7 +1652,6 @@
             var parts = [];
             if (strategy.rendering) parts.push(t("image_strategy_rendering") + ": " + comparisonValueLabel("rendering", strategy.rendering));
             if (strategy.palette) parts.push(t("image_strategy_palette") + ": " + comparisonValueLabel("palette", strategy.palette));
-            if (strategy.custom) parts.push(strategy.custom);
             desc.textContent = parts.join(" · ") || t("image_strategy_reference_hint");
         }
         refreshImageStrategyPreview = paint;
@@ -1817,24 +1747,6 @@
             markStrategyCard(selectedCard || strategyGrid.querySelector('[data-strategy-index="' + idx + '"]'));
             refreshImageStrategyPreview();
         }
-        function imageStrategyCandidateIndex(strategy) {
-            if (!strategy) return -1;
-            for (var i = 0; i < strategyCands.length; i += 1) {
-                if (strategyCands[i] &&
-                        strategyCands[i].rendering === strategy.rendering &&
-                        strategyCands[i].palette === strategy.palette) {
-                    return i;
-                }
-            }
-            return -1;
-        }
-        function isManualImageStrategy(strategy) {
-            if (!strategy) return false;
-            return Object.prototype.hasOwnProperty.call(strategy, "custom") ||
-                strategy.rendering === "custom" ||
-                strategy.palette === "custom" ||
-                imageStrategyCandidateIndex(strategy) < 0;
-        }
         strategyCands.forEach(function (c, idx) {
             var card = el("div", "font-card");
             card.setAttribute("data-strategy-index", String(idx));
@@ -1875,26 +1787,16 @@
         manualControls.appendChild(renderingWrap);
         manualControls.appendChild(paletteWrap);
         manualCard.appendChild(manualControls);
-        var customWrap = el("label", "image-strategy-custom-wrap");
-        customWrap.appendChild(el("span", "image-strategy-select-label", t("image_strategy_custom_prompt")));
-        var customInput = el("textarea", "text-input image-strategy-custom-input");
-        customInput.rows = 3;
-        customInput.placeholder = t("image_strategy_custom_placeholder");
-        customInput.value = (STATE.image_strategy && STATE.image_strategy.custom) || "";
-        customWrap.appendChild(customInput);
-        manualCard.appendChild(customWrap);
         function selectManualImageStrategy() {
             var rendering = renderingSelect.value;
             var palette = paletteSelect.value;
-            var custom = customInput.value || "";
             STATE.image_strategy = {
                 name: t("image_strategy_manual"),
                 rendering: rendering,
                 palette: palette,
                 visual: comparisonLabel(comparisonItem("rendering", rendering), "rendering") || comparisonValueLabel("rendering", rendering),
                 color: t("image_strategy_color_follow"),
-                mood: t("image_strategy_manual_desc"),
-                custom: custom
+                mood: t("image_strategy_manual_desc")
             };
             markStrategyCard(manualCard);
             refreshImageStrategyPreview();
@@ -1905,8 +1807,6 @@
                 selectManualImageStrategy();
             });
         });
-        customInput.addEventListener("click", function (e) { e.stopPropagation(); });
-        customInput.addEventListener("input", selectManualImageStrategy);
         manualCard.addEventListener("click", selectManualImageStrategy);
         strategyGrid.appendChild(manualCard);
         strategySub.appendChild(strategyGrid);
@@ -1953,18 +1853,8 @@
             function () { return STATE.image_ai_path; }, function (v) { STATE.image_ai_path = v; });
         sec.appendChild(sub);
         sec.appendChild(strategySub);
-        if (isManualImageStrategy(STATE.image_strategy)) {
-            renderingSelect.value = firstComparisonId("rendering", STATE.image_strategy.rendering || renderingSelect.value);
-            paletteSelect.value = firstComparisonId("palette", STATE.image_strategy.palette || paletteSelect.value);
-            customInput.value = STATE.image_strategy.custom || "";
-            selectManualImageStrategy();
-        } else if (STATE.image_strategy && imageStrategyCandidateIndex(STATE.image_strategy) >= 0) {
-            selectImageStrategy(imageStrategyCandidateIndex(STATE.image_strategy));
-        } else if (strategyCands.length) {
-            selectImageStrategy(imageStrategySelectedIndex());
-        } else {
-            selectManualImageStrategy();
-        }
+        if (strategyCands.length) selectImageStrategy(imageStrategySelectedIndex());
+        else selectManualImageStrategy();
         refreshUsageChips();
         host.appendChild(sec);
     }
@@ -2095,11 +1985,6 @@
         STATE.content_divergence = (REC.content_divergence && REC.content_divergence.value) || "";  // free text; blank = balanced default
         STATE.mode = pick("mode", CAT.modes);
         STATE.visual_style = pick("visual_style", CAT.visual_styles);
-        if (hasTemplateAdherence()) {
-            STATE.template_adherence = pick("template_adherence", CAT.template_adherence);
-        } else {
-            delete STATE.template_adherence;
-        }
         // Delivery purpose drives the PPT body px baseline; default balanced
         // (not the catalog-first id) when the Strategist did not recommend one.
         STATE.delivery_purpose = recId("delivery_purpose") || "balanced";
@@ -2176,7 +2061,6 @@
             mode: STATE.mode,
             visual_style: STATE.visual_style
         };
-        if (STATE.template_adherence) payload.template_adherence = STATE.template_adherence;
         // Delivery purpose is PPT-only and rendered only on PPT canvases (§c).
         if (isPptCanvas(STATE.canvas)) payload.delivery_purpose = STATE.delivery_purpose;
         return payload;
@@ -2196,7 +2080,6 @@
             typography: STATE.typography,
             formula_policy: STATE.formula_policy
         };
-        if (STATE.template_adherence) payload.template_adherence = STATE.template_adherence;
         if (isPptCanvas(STATE.canvas)) payload.delivery_purpose = STATE.delivery_purpose;
         normalizeTypographyForSubmit(payload);
         return payload;
@@ -2231,36 +2114,25 @@
         l.style.display = "block";
     }
 
-    // Poll session state first. It is derived from recommendations.json and
-    // result.json, so a recovered server can tell the existing page exactly when
-    // the next re-derived stage is ready.
+    // Poll the recommendations endpoint (no-store) until the AI overwrites it with
+    // the next re-derived stage, then render it in the same session.
     function pollForStage(nextStage) {
-        fetchJson("/api/session", "session")
-            .then(function (session) {
-                var readyStage = Number(session && session.recommendation_stage_number || 0);
-                if (readyStage < nextStage) {
-                    setTimeout(function () { pollForStage(nextStage); }, 1200);
-                    return null;
-                }
-                return fetchJson("/api/recommendations", "recommendations").then(function (data) {
-                    var serverStage = stageNumber(data);
-                    if (data && typeof serverStage === "number" && serverStage >= nextStage) {
-                        enterStage(data, serverStage);
-                    }
-                    else { setTimeout(function () { pollForStage(nextStage); }, 1200); }
-                    return null;
-                });
+        fetch("/api/recommendations", { cache: "no-store" })
+            .then(function (r) { if (!r.ok) throw new Error("poll failed"); return r.json(); })
+            .then(function (data) {
+                if (data && stageNumber(data) === nextStage) { enterStage(data, nextStage); }
+                else { setTimeout(function () { pollForStage(nextStage); }, 1200); }
             }).catch(function (err) {
                 var l = document.getElementById("loading");
-                if (l) l.textContent = t("connection_lost") + " " + (err && err.message ? err.message : "");
+                if (l) l.textContent = t("load_error") + " " + (err && err.message ? err.message : "");
                 setTimeout(function () { pollForStage(nextStage); }, 1500);
             });
     }
 
     function enterStage(data, stage) {
         REC = data;
-        if (stage >= 2) initStage2State();
-        if (stage >= 3) initStage3State();
+        if (stage === 2) initStage2State();
+        if (stage === 3) initStage3State();
         STAGE = stage;
         document.getElementById("loading").style.display = "none";
         document.getElementById("sections").style.display = "block";
@@ -2316,37 +2188,21 @@
         e.textContent = msg;
     }
 
-    function fetchJson(url, label) {
-        return fetch(url, { cache: "no-store" }).then(function (r) {
-            return r.text().then(function (text) {
-                var data = null;
-                if (text) {
-                    try { data = JSON.parse(text); }
-                    catch (e) {
-                        if (r.ok) throw new Error((label || url) + ": invalid JSON");
-                    }
-                }
-                if (!r.ok) {
-                    var serverMsg = data && data.error ? data.error : (text || r.statusText || r.status);
-                    throw new Error((label || url) + ": " + serverMsg);
-                }
-                return data || {};
-            });
-        });
-    }
-
     function loadCatalogs() {
-        return fetchJson("/api/catalogs", "catalogs")
-            .catch(function () { return fetchJson("/static/catalogs.json", "static catalogs"); });
+        return fetch("/api/catalogs")
+            .then(function (r) { if (r.ok) return r.json(); throw new Error("no api"); })
+            .catch(function () { return fetch("/static/catalogs.json").then(function (r) { return r.json(); }); });
     }
 
     function loadIconPreviews() {
-        return fetchJson("/api/icon-previews", "icon previews")
+        return fetch("/api/icon-previews")
+            .then(function (r) { if (r.ok) return r.json(); throw new Error("no icon preview api"); })
             .catch(function () { return {}; });
     }
 
     function loadAiImageComparison() {
-        return fetchJson("/api/ai-image-comparison", "ai image comparison")
+        return fetch("/api/ai-image-comparison")
+            .then(function (r) { if (r.ok) return r.json(); throw new Error("no ai image comparison api"); })
             .catch(function () { return {}; });
     }
 
@@ -2434,7 +2290,7 @@
 
         Promise.all([
             loadCatalogs(),
-            fetchJson("/api/recommendations", "recommendations"),
+            fetch("/api/recommendations").then(function (r) { if (!r.ok) throw new Error("load failed"); return r.json(); }),
             loadIconPreviews(),
             loadAiImageComparison()
         ]).then(function (res) {
@@ -2457,8 +2313,8 @@
             if (REC._already_confirmed) {
                 document.getElementById("confirm-status").textContent = t("already_confirmed");
             }
-        }).catch(function (err) {
-            showError(t("load_error") + " " + (err && err.message ? err.message : ""));
+        }).catch(function () {
+            showError(t("load_error"));
         });
     }
 

@@ -27,6 +27,7 @@ const HIFI = path.join(SKILL_DIR, 'scripts', 'ppt_master_hifi.py');
 // Deterministic fallback: pure python-pptx renderer (zero external deps
 // beyond python-pptx itself).
 const GEN = path.join(SKILL_DIR, 'scripts', 'ppt_studio_generate.py');
+const MARP = path.join(SKILL_DIR, 'scripts', 'ppt_marp.py');
 
 // --- python resolver (portable across environments) -----------------------
 function resolvePython() {
@@ -72,7 +73,7 @@ const TOOLS = [
       properties: {
         brief: {
           type: 'object',
-          description: 'The PPT brief JSON. Must contain "slides" array; optional "theme" or "style" (one of the 8 themes from list_styles), "title", "footer", "page_numbers". Slide types include media (image+text) and any slide may carry "notes" (speaker notes).',
+          description: 'The PPT brief JSON. Must contain "slides" array; optional "theme" or "style" (one of the 12 themes from list_styles), "title", "footer", "page_numbers", "delivery" (editable|showcase), "narrative" (persuade|inform|teach|inspire). Slide types include media (image+text) and any slide may carry "notes" (speaker notes).',
         },
         out: { type: 'string', description: 'Output .pptx path (e.g. "./deck.pptx").' },
       },
@@ -93,6 +94,11 @@ const TOOLS = [
   {
     name: 'list_styles',
     description: 'List the available design palettes (color schemes) for the PPT brief "style" field.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'list_templates',
+    description: 'List the available starting-deck templates (template market). Each template bundles a theme, narrative, delivery path, and a page scaffold.',
     inputSchema: { type: 'object', properties: {} },
   },
 ];
@@ -126,6 +132,7 @@ function handleMessage(line) {
       if (name === 'generate_ppt') result = doGenerate(args);
       else if (name === 'qa_check') result = doQa(args);
       else if (name === 'list_styles') result = doStyles();
+      else if (name === 'list_templates') result = doTemplates();
       else throw new Error('Unknown tool: ' + name);
       send({ jsonrpc: '2.0', id, result: { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] } });
     } catch (e) {
@@ -150,6 +157,19 @@ function doGenerate(args) {
   const tmp = path.join(os.tmpdir(), 'ppt-studio-brief-' + Date.now() + '.json');
   fs.writeFileSync(tmp, JSON.stringify(brief, null, 2), 'utf8');
   const py = resolvePython();
+
+  // SHOWCASE: Marp HTML path (visual-ceiling HTML PPT, one source -> HTML/PDF/PPTX).
+  if (brief.delivery === 'showcase') {
+    let htmlOut = out;
+    if (!/\.html?$/i.test(htmlOut)) htmlOut = htmlOut.replace(/\.[^.]+$/, '') + '.html';
+    const extra = [];
+    if (args.pdf) extra.push('--pdf');
+    if (args.pptx) extra.push('--pptx');
+    const r = runRender(py, MARP, tmp, htmlOut, extra);
+    if (r.error) throw new Error('marp error: ' + r.error.message);
+    if (r.status !== 0) throw new Error('marp render failed: ' + (r.stderr || r.stdout));
+    return { ok: true, file: path.resolve(htmlOut), engine: 'marp (ppt_marp.py showcase)', stdout: (r.stdout || '').trim() };
+  }
 
   // PRIMARY: ppt-master SVG->PPTX (highest-starred PPTX skill).
   let engine = 'ppt-master (ppt_master_hifi.py)';
@@ -212,6 +232,29 @@ function doStyles() {
       { id: 'fintech_green', label: '金融绿 (Fintech Green)' },
       { id: 'sunset_orange', label: '暖阳橙 (Sunset Orange)' },
       { id: 'mono_ink', label: '极简墨 (Mono Ink)' },
+      { id: 'guochao_red', label: '国潮红 (Guochao Red)' },
+      { id: 'medical_blue', label: '医疗蓝 (Medical Blue)' },
+      { id: 'ecommerce_orange', label: '电商橙 (E-commerce Orange)' },
+      { id: 'gov_red', label: '党政红 (Official Red)' },
+    ],
+  };
+}
+
+function doTemplates() {
+  // Mirrors templates/*.json in the template market (run `template_market.py list`).
+  return {
+    ok: true,
+    templates: [
+      { id: 'startup_pitch', label: '融资路演 (Startup Pitch)', narrative: 'persuade', delivery: 'editable', theme: 'tech_dark' },
+      { id: 'course_lecture', label: '课程课件 (Course Lecture)', narrative: 'teach', delivery: 'editable', theme: 'academic_white' },
+      { id: 'annual_review', label: '年度复盘 (Annual Review)', narrative: 'inform', delivery: 'editable', theme: 'business_blue' },
+      { id: 'product_launch', label: '产品发布 (Product Launch)', narrative: 'inspire', delivery: 'showcase', theme: 'creative_purple' },
+      { id: 'xhs_knowledge', label: '小红书知识卡 (XHS Knowledge)', narrative: 'inform', delivery: 'showcase', theme: 'sunset_orange' },
+      { id: 'gov_report', label: '党政汇报 (Official Report)', narrative: 'inform', delivery: 'editable', theme: 'gov_red' },
+      { id: 'medical_science', label: '医疗科普 (Medical Science)', narrative: 'teach', delivery: 'editable', theme: 'medical_blue' },
+      { id: 'ecom_promo', label: '电商大促 (E-com Promo)', narrative: 'inspire', delivery: 'showcase', theme: 'ecommerce_orange' },
+      { id: 'guochao_brand', label: '国潮品牌 (Guochao Brand)', narrative: 'inspire', delivery: 'showcase', theme: 'guochao_red' },
+      { id: 'fintech_report', label: '金融研报 (Fintech Report)', narrative: 'inform', delivery: 'editable', theme: 'fintech_green' },
     ],
   };
 }

@@ -1,0 +1,41 @@
+{
+  "label": "党政汇报 (Official Report)",
+  "description": "国企/党政汇报：背景→成效→经验→计划（正式庄重）",
+  "theme": "gov_red",
+  "narrative": "inform",
+  "delivery": "editable",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "汇报主题"
+    },
+    {
+      "type": "section",
+      "title": "一、工作背景"
+    },
+    {
+      "type": "content",
+      "title": "主要成效",
+      "items": [
+        "成效一",
+        "成效二"
+      ]
+    },
+    {
+      "type": "chart",
+      "title": "数据支撑"
+    },
+    {
+      "type": "content",
+      "title": "经验做法",
+      "items": [
+        "做法一",
+        "做法二"
+      ]
+    },
+    {
+      "type": "summary",
+      "title": "下一步计划"
+    }
+  ]
+}

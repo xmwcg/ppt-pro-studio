@@ -1,0 +1,53 @@
+{
+  "label": "课程课件 (Course Lecture)",
+  "description": "培训/教学：目标→概念→原理→案例→练习→小结",
+  "theme": "academic_white",
+  "narrative": "teach",
+  "delivery": "editable",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "课程名"
+    },
+    {
+      "type": "section",
+      "title": "学习目标"
+    },
+    {
+      "type": "content",
+      "title": "核心概念",
+      "items": [
+        "概念一",
+        "概念二"
+      ]
+    },
+    {
+      "type": "content",
+      "title": "原理解析",
+      "items": [
+        "原理一",
+        "原理二"
+      ]
+    },
+    {
+      "type": "media",
+      "title": "实战案例",
+      "items": [
+        "场景",
+        "步骤"
+      ]
+    },
+    {
+      "type": "two_column",
+      "title": "随堂练习",
+      "items": [
+        "题目",
+        "思路"
+      ]
+    },
+    {
+      "type": "summary",
+      "title": "小结 + 拓展阅读"
+    }
+  ]
+}

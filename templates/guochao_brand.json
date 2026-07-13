@@ -1,0 +1,33 @@
+{
+  "label": "国潮品牌 (Guochao Brand)",
+  "description": "国风品牌故事：文化→匠心→主张（视觉天花板）",
+  "theme": "guochao_red",
+  "narrative": "inspire",
+  "delivery": "showcase",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "品牌名 + 文化主张"
+    },
+    {
+      "type": "quote",
+      "title": "东方美学 · 当代表达"
+    },
+    {
+      "type": "content",
+      "title": "文化溯源",
+      "items": [
+        "元素一",
+        "元素二"
+      ]
+    },
+    {
+      "type": "media",
+      "title": "匠心工艺"
+    },
+    {
+      "type": "summary",
+      "title": "邀请共赏"
+    }
+  ]
+}

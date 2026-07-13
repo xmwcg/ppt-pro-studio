@@ -1,0 +1,38 @@
+{
+  "label": "小红书知识卡 (XHS Knowledge)",
+  "description": "种草/知识科普：痛点→方法→清单（视觉吸睛）",
+  "theme": "sunset_orange",
+  "narrative": "inform",
+  "delivery": "showcase",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "标题党金句 + 封面"
+    },
+    {
+      "type": "content",
+      "title": "你是不是也……（痛点）"
+    },
+    {
+      "type": "content",
+      "title": "3 个方法",
+      "items": [
+        "方法一",
+        "方法二",
+        "方法三"
+      ]
+    },
+    {
+      "type": "two_column",
+      "title": "避坑清单",
+      "items": [
+        "别做",
+        "要做"
+      ]
+    },
+    {
+      "type": "summary",
+      "title": "收藏 + 关注引导"
+    }
+  ]
+}

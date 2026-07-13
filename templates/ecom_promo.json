@@ -1,0 +1,33 @@
+{
+  "label": "电商大促 (E-com Promo)",
+  "description": "直播/大促主视觉：利益点→爆款→倒计时（转化导向）",
+  "theme": "ecommerce_orange",
+  "narrative": "inspire",
+  "delivery": "showcase",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "大促主视觉 + 利益点"
+    },
+    {
+      "type": "content",
+      "title": "为什么买",
+      "items": [
+        "痛点",
+        "爽点"
+      ]
+    },
+    {
+      "type": "media",
+      "title": "爆款展示"
+    },
+    {
+      "type": "chart",
+      "title": "价格对比 / 折扣力度"
+    },
+    {
+      "type": "summary",
+      "title": "立即抢购（倒计时）"
+    }
+  ]
+}

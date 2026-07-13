@@ -83,6 +83,30 @@ BUILTIN_THEMES = {
         "secondary": "A0A0A0", "text": "FFFFFF", "muted": "7A7A7A",
         "accent": "FF4D4D", "line": "2A2A2A", "font": "Microsoft YaHei",
     },
+    "guochao_red": {
+        "label": "国潮红 (Guochao Red)",
+        "bg": "1A0808", "surface": "2A1010", "primary": "C8102E",
+        "secondary": "2A9D8F", "text": "FBF3E8", "muted": "B8897A",
+        "accent": "E8B04B", "line": "3D1A1A", "font": "Microsoft YaHei",
+    },
+    "medical_blue": {
+        "label": "医疗蓝 (Medical Blue)",
+        "bg": "F4F9FC", "surface": "E3F0F8", "primary": "0B6E9E",
+        "secondary": "16A2C7", "text": "1A2B36", "muted": "5B7C8D",
+        "accent": "2EA66B", "line": "C9E2F0", "font": "Microsoft YaHei",
+    },
+    "ecommerce_orange": {
+        "label": "电商橙 (E-commerce Orange)",
+        "bg": "FFF7F0", "surface": "FFE9D6", "primary": "FF6A00",
+        "secondary": "FF3D77", "text": "2B1A12", "muted": "9A7B68",
+        "accent": "FFC400", "line": "FFD9BE", "font": "Microsoft YaHei",
+    },
+    "gov_red": {
+        "label": "党政红 (Official Red)",
+        "bg": "FFFFFF", "surface": "FBEAEC", "primary": "C8102E",
+        "secondary": "9E1B32", "text": "1A1A1A", "muted": "6B6B6B",
+        "accent": "D4AF37", "line": "E6C9CE", "font": "Microsoft YaHei",
+    },
 }
 
 DEFAULT_THEME = "tech_dark"

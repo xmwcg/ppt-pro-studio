@@ -1,0 +1,41 @@
+{
+  "label": "年度复盘 (Annual Review)",
+  "description": "年终汇报：背景→进展→问题→结论→下一步",
+  "theme": "business_blue",
+  "narrative": "inform",
+  "delivery": "editable",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "2025 年度复盘"
+    },
+    {
+      "type": "agenda",
+      "title": "议程"
+    },
+    {
+      "type": "content",
+      "title": "背景 / 目标"
+    },
+    {
+      "type": "chart",
+      "title": "关键进展（数据）"
+    },
+    {
+      "type": "two_column",
+      "title": "问题分析",
+      "items": [
+        "原因",
+        "影响"
+      ]
+    },
+    {
+      "type": "summary",
+      "title": "结论"
+    },
+    {
+      "type": "contact",
+      "title": "下一步 / 负责人"
+    }
+  ]
+}

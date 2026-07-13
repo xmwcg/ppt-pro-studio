@@ -1,0 +1,58 @@
+{
+  "label": "融资路演 (Startup Pitch)",
+  "description": "投资人路演：痛点→方案→证明→ROI→行动号召",
+  "theme": "tech_dark",
+  "narrative": "persuade",
+  "delivery": "editable",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "公司名 + 一句话价值主张"
+    },
+    {
+      "type": "section",
+      "title": "01 痛点"
+    },
+    {
+      "type": "content",
+      "title": "现状为什么痛",
+      "items": [
+        "痛点一",
+        "痛点二",
+        "痛点三"
+      ]
+    },
+    {
+      "type": "content",
+      "title": "为什么是现在",
+      "items": [
+        "趋势/窗口",
+        "催化剂"
+      ]
+    },
+    {
+      "type": "content",
+      "title": "我们的方案",
+      "items": [
+        "核心差异",
+        "技术壁垒"
+      ]
+    },
+    {
+      "type": "media",
+      "title": "证明：数据 / 案例 / 客户",
+      "items": [
+        "关键指标",
+        "标杆客户"
+      ]
+    },
+    {
+      "type": "chart",
+      "title": "价值 / ROI 量化"
+    },
+    {
+      "type": "summary",
+      "title": "行动号召（投资 / 合作）"
+    }
+  ]
+}

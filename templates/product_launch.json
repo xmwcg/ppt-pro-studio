@@ -1,0 +1,42 @@
+{
+  "label": "产品发布 (Product Launch)",
+  "description": "发布会/品牌发布：愿景→共鸣→行动→号召（视觉天花板）",
+  "theme": "creative_purple",
+  "narrative": "inspire",
+  "delivery": "showcase",
+  "pages": [
+    {
+      "type": "cover",
+      "title": "产品名 + 发布主张"
+    },
+    {
+      "type": "quote",
+      "title": "我们相信……"
+    },
+    {
+      "type": "content",
+      "title": "用户共鸣故事"
+    },
+    {
+      "type": "section",
+      "title": "全新能力"
+    },
+    {
+      "type": "content",
+      "title": "核心亮点",
+      "items": [
+        "亮点一",
+        "亮点二",
+        "亮点三"
+      ]
+    },
+    {
+      "type": "media",
+      "title": "实景演示"
+    },
+    {
+      "type": "summary",
+      "title": "邀请体验"
+    }
+  ]
+}

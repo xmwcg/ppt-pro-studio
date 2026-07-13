@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """PPT Master - SVG to PPTX Tool (thin wrapper).
 
-Delegates to the svg_to_pptx package. ``-s final`` remains a native-export
-diagnostic override; the standard pipeline reads ``svg_output/``:
+Delegates to the svg_to_pptx package. Kept for CLI backward compatibility:
     python3 scripts/svg_to_pptx.py <project_path> -s final
 """
 
@@ -18,4 +17,4 @@ from svg_to_pptx import main
 configure_utf8_stdio()
 
 if __name__ == '__main__':
-    raise SystemExit(main())
+    main()

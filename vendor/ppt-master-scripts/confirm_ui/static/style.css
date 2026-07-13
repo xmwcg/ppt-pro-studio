@@ -500,18 +500,9 @@ body {
 .font-sample-body { font-size: 14px; color: #333; margin-top: 4px; }
 .custom-typography-input { margin-top: 8px; min-height: 58px; resize: vertical; }
 .custom-color-input { margin-top: 8px; min-height: 58px; resize: vertical; }
-.image-strategy-custom-input { margin-top: 8px; min-height: 72px; resize: vertical; }
 .image-usage-notes-input { min-height: 64px; resize: vertical; }
 .font-size-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .font-size-input { width: 96px; }
-.font-size-unit {
-    color: var(--muted);
-    font-size: 12.5px;
-    font-weight: 600;
-}
-.body-size-relation { margin-bottom: 6px; }
-.body-size-pt { margin-top: 6px; }
-.body-size-hint { margin-top: 3px; }
 
 .subfield { margin-top: 14px; }
 .subfield-label { font-size: 12.5px; color: var(--muted); margin-bottom: 7px; }
@@ -585,8 +576,6 @@ body {
 .hex-cell { display: flex; flex-direction: column; gap: 4px; }
 .hex-cell-label { font-size: 11px; color: var(--muted); }
 .hex-input-line { display: flex; align-items: center; gap: 6px; }
-.role-size-line { display: flex; align-items: center; gap: 6px; }
-.role-size-pt { min-height: 15px; font-size: 11px; color: var(--muted); }
 .hex-cell input {
     width: 92px;
     border: 1px solid var(--line);

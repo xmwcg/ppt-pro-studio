@@ -112,3 +112,52 @@ Use this structure, omitting empty or irrelevant sections:
 | Constraints(sections) | 章节 | 3–6 模块 |
 | Output Format | 交付格式 | .pptx / .pdf / 网页 |
 | Success Criteria | 验收 | 可编辑/无水印/中文正常 |
+
+## 叙事结构（P3-2 新增）
+
+按 `Goal` 选一种叙事骨架，写入 brief 的 `narrative` 字段；大纲阶段据此排布逐页版式。
+4 种骨架的逐页映射（`type` 对应渲染器版式，见 SKILL.md ②→③）：
+
+### persuade · 说服型（融资 / 销售 / 提案）
+| 顺序 | type | 作用 |
+|------|------|------|
+| 1 | cover | 封面 + 一句话价值主张 |
+| 2 | section | 痛点：现状为什么痛 |
+| 3 | content | 为什么是现在（趋势/窗口） |
+| 4 | content | 我们的方案（核心差异） |
+| 5 | media | 证明：数据 / 案例 / 客户 logos |
+| 6 | chart | 价值 / ROI 量化 |
+| 7 | summary | 行动号召 CTA（试用 / 投资 / 合作） |
+
+### inform · 通知型（汇报 / 复盘 / 公告）
+| 顺序 | type | 作用 |
+|------|------|------|
+| 1 | cover | 封面 + 本期主题 |
+| 2 | agenda | 议程 |
+| 3 | content | 背景 / 目标 |
+| 4 | chart | 关键进展（数据） |
+| 5 | two_column | 问题分析（左因 / 右果） |
+| 6 | summary | 结论 |
+| 7 | contact | 下一步 / 负责人 |
+
+### teach · 教学型（课程 / 培训）
+| 顺序 | type | 作用 |
+|------|------|------|
+| 1 | cover | 封面 + 课程名 |
+| 2 | section | 学习目标 |
+| 3 | content | 核心概念 |
+| 4 | content | 原理解析 |
+| 5 | media | 实战案例 |
+| 6 | two_column | 随堂练习（左题 / 右思路） |
+| 7 | summary | 小结 + 拓展阅读 |
+
+### inspire · 激励型（路演 / 宣讲 / 动员）
+| 顺序 | type | 作用 |
+|------|------|------|
+| 1 | cover | 封面 + 使命金句 |
+| 2 | quote | 愿景 / 使命 |
+| 3 | content | 共鸣故事 |
+| 4 | section | 挑战 / 机遇 |
+| 5 | content | 我们的行动 |
+| 6 | summary | 邀请同行（号召） |
+| 7 | contact | 加入方式 |

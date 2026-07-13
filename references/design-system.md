@@ -1,6 +1,6 @@
 # Design System — PPT Pro Studio
 
-主题市场（Theme Market）：8 套商用主题，统一排版规则。渲染器按 brief 的
+主题市场（Theme Market）：12 套商用主题，统一排版规则。渲染器按 brief 的
 `theme`（或 `style`）字段套用，主题以独立 JSON 存放于 `themes/`，可自由扩展。
 权威来源见 `themes/*.json`（`python3 scripts/theme_market.py list`）。
 
@@ -16,6 +16,10 @@
 | fintech_green | 0B1F17 | 122B20 | 2EA66B | 4FD1A1 | EAF6F0 | 7FA593 | F2B705 | 1E3A2C |
 | sunset_orange | 1A1206 | 2A1D0C | E8843C | F2B705 | FFF3E6 | B58A5E | 5BC0EB | 3A2A14 |
 | mono_ink | 0A0A0A | 161616 | FFFFFF | A0A0A0 | FFFFFF | 7A7A7A | FF4D4D | 2A2A2A |
+| guochao_red | 1A0808 | 2A1010 | C8102E | 2A9D8F | FBF3E8 | B8897A | E8B04B | 3D1A1A |
+| medical_blue | F4F9FC | E3F0F8 | 0B6E9E | 16A2C7 | 1A2B36 | 5B7C8D | 2EA66B | C9E2F0 |
+| ecommerce_orange | FFF7F0 | FFE9D6 | FF6A00 | FF3D77 | 2B1A12 | 9A7B68 | FFC400 | FFD9BE |
+| gov_red | FFFFFF | FBEAEC | C8102E | 9E1B32 | 1A1A1A | 6B6B6B | D4AF37 | E6C9CE |
 
 - **tech_dark**：发布会/科技分享/路演首选，金色主标题+科技蓝副标题。
 - **business_blue**：商业汇报、企业内训，稳重专业。
@@ -25,6 +29,10 @@
 - **fintech_green**：金融/数据/增长主题，绿金搭配，信任感强。
 - **sunset_orange**：暖色调营销/品牌故事，亲和有温度。
 - **mono_ink**：极简黑白＋一点红，高对比、强记忆点。
+- **guochao_red**：国潮/文创/传统节日，中国红+玉色+描金，文化质感强。
+- **medical_blue**：医疗/健康/科普，临床蓝+医疗绿，干净可信。
+- **ecommerce_orange**：电商/直播/大促，橙粉撞色+高亮黄，转化导向。
+- **gov_red**：党政/国企汇报，红白金正式庄重，合规稳重。
 
 ## 排版规则（全局统一）
 

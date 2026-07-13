@@ -104,6 +104,73 @@ def _fit_text(text: str, w_in: float, h_in: float, size: float, floor=FONT_FLOOR
         text = text.rstrip() + "\u2026"
     return sz, text
 
+
+def _fit_bullets(items: list[str], w_in: float, h_in: float,
+                 head_sz: float = 15, detail_sz: float = 12,
+                 floor: float = FONT_FLOOR) -> tuple[float, float, list[str]]:
+    """Pre-calculate the optimal font sizes for a list of bullet items in a
+    given box. Each item may contain a "|" separator (head | detail).
+
+    Returns (adjusted_head_sz, adjusted_detail_sz, truncated_items) where
+    truncated_items may have ellipsis appended to items that still overflow
+    even at the floor size.
+
+    This is the P3-6 "pre-calculation" approach: instead of rendering first
+    and hoping TEXT_TO_FIT_SHAPE catches up (unreliable in WPS), we estimate
+    the total vertical space needed and shrink the font *before* writing any
+    text box — so the rendered output is correct on the first pass.
+    """
+    head_sz = float(head_sz)
+    detail_sz = float(detail_sz)
+    line_factor = 1.3  # pt-to-height factor (line spacing)
+
+    def _item_height(hs: float, ds: float, it: str) -> float:
+        """Estimated vertical space (pt) for one bullet item."""
+        if "|" in it:
+            head, detail = it.split("|", 1)
+        else:
+            head, detail = it, None
+        h = _estimate_lines(head.strip(), hs, w_in) * hs * line_factor
+        if detail and detail.strip():
+            h += _estimate_lines(detail.strip(), ds, w_in) * ds * line_factor
+        return h
+
+    # Phase 1: shrink head/detail together until everything fits or hits floor
+    while head_sz > floor or detail_sz > max(floor - 2, 9):
+        total = sum(_item_height(head_sz, detail_sz, it) for it in items)
+        if total <= h_in * 72.0:
+            break
+        head_sz = max(head_sz - 0.5, floor)
+        detail_sz = max(detail_sz - 0.5, max(floor - 2, 9))
+
+    # Phase 2: if still overflowing at floor, truncate longest items
+    total = sum(_item_height(head_sz, detail_sz, it) for it in items)
+    if total > h_in * 72.0:
+        out_items = []
+        remaining_h = h_in * 72.0
+        for it in items:
+            ih = _item_height(head_sz, detail_sz, it)
+            if ih > remaining_h and remaining_h < h_in * 72.0 * 0.15:
+                # not enough space for this item — stop
+                break
+            if ih > remaining_h:
+                # truncate this item to fit
+                truncated = it
+                while len(truncated) > 1 and \
+                        _item_height(head_sz, detail_sz, truncated) > remaining_h:
+                    truncated = truncated[:-1]
+                if len(truncated) < len(it):
+                    truncated = truncated.rstrip() + "\u2026"
+                out_items.append(truncated)
+                remaining_h = 0
+            else:
+                out_items.append(it)
+                remaining_h -= ih
+        return head_sz, detail_sz, out_items if out_items else items[:1]
+
+    return head_sz, detail_sz, items
+
+
 PALETTES = {
     "tech_dark": {  # 深色科技风 (from the commercial delivery reference pack)
         "bg": "0D1117", "surface": "151D2E", "primary": "D4A060", "secondary": "58A6FF",
@@ -413,10 +480,14 @@ class Studio:
             self._bullets(s, items, 0.9, 1.7, 11.5, 0.62)
 
     def _bullets(self, s, items, x, y, w, gap=0.62, max_y=7.0):
-        if items:
-            # Shrink the per-item gap so many bullets never overflow the slide.
-            avail = max_y - y
-            gap = min(gap, avail / len(items))
+        if not items:
+            return
+        avail_h = max_y - y  # available vertical space in inches
+        # P3-6: pre-calculate font sizes that fit all items in available space
+        head_sz, detail_sz, items = _fit_bullets(
+            items, w - 0.3, avail_h, head_sz=15, detail_sz=12, floor=FONT_FLOOR)
+        # Dynamic gap: fit items evenly, but cap at the requested gap
+        gap = min(gap, avail_h / max(1, len(items)))
         for i, it in enumerate(items):
             yy = y + i * gap
             # bullet dot
@@ -426,11 +497,12 @@ class Studio:
                 head, detail = it.split("|", 1)
             else:
                 head, detail = it, ""
-            self._txt(s, x + 0.3, yy, w - 0.3, 0.55, head, size=15,
-                      color=self.p["text"], bold=True)
-            if detail:
-                self._txt(s, x + 0.3, yy + 0.42, w - 0.3, 0.5, detail, size=12,
-                          color=self.p["muted"])
+            self._txt(s, x + 0.3, yy, w - 0.3, gap * 0.9, head, size=head_sz,
+                      color=self.p["text"], bold=True, floor=FONT_FLOOR)
+            if detail and detail.strip():
+                self._txt(s, x + 0.3, yy + gap * 0.55, w - 0.3, gap * 0.5,
+                          detail, size=detail_sz, color=self.p["muted"],
+                          floor=max(FONT_FLOOR - 2, 9))
 
     def two_column(self, s, data):
         self._bg(s)
@@ -453,31 +525,47 @@ class Studio:
         rows = data.get("rows", [])
         nrows = len(rows) + 1
         ncols = max(len(headers), *(len(r) for r in rows) if rows else [1])
+        tbl_w = 12.1
+        col_w = tbl_w / ncols  # P3-6: per-column width for pre-calculation
         gtab = s.shapes.add_table(nrows, ncols, Inches(0.6), Inches(1.7),
-                                  Inches(12.1), Inches(4.8)).table
+                                  Inches(tbl_w), Inches(4.8)).table
         gtab.columns  # ensure
         for j, h in enumerate(headers):
             cell = gtab.cell(0, j)
             cell.text = str(h)
             cell.fill.solid()
             cell.fill.fore_color.rgb = _c(self.p["primary"])
-            self._cell_font(cell, size=13, bold=True, color="FFFFFF")
+            self._cell_font(cell, size=13, bold=True, color="FFFFFF",
+                            col_width_in=col_w)
         for i, row in enumerate(rows, 1):
             for j, val in enumerate(row):
                 cell = gtab.cell(i, j)
                 cell.text = str(val)
                 cell.fill.solid()
                 cell.fill.fore_color.rgb = _c(self.p["surface"] if i % 2 else self.p["bg"])
-                self._cell_font(cell, size=12, color=self.p["text"])
+                self._cell_font(cell, size=12, color=self.p["text"],
+                                col_width_in=col_w)
 
-    def _cell_font(self, cell, size=12, bold=False, color="FFFFFF"):
+    def _cell_font(self, cell, size=12, bold=False, color="FFFFFF",
+                   col_width_in=None):
+        """Set cell font with P3-6 pre-calculation. Instead of relying on
+        TEXT_TO_FIT_SHAPE (unreliable in WPS), we estimate whether the text
+        fits at the target size and shrink explicitly if needed."""
         tf = cell.text_frame
         tf.word_wrap = True
-        tf.auto_size = MSO_AUTO_SIZE.TEXT_TO_FIT_SHAPE
+        # P3-6: estimate font size from cell width if available
+        actual_size = float(size)
+        if col_width_in and col_width_in > 0:
+            # approximate available text width minus cell margins
+            text_w = col_width_in - 0.2
+            # approximate available height (assume ~0.4in per row by default)
+            text_h = 0.4
+            actual_size, _ = _fit_text(
+                cell.text, text_w, text_h, size, floor=max(FONT_FLOOR - 2, 9))
         for para in tf.paragraphs:
             para.alignment = PP_ALIGN.LEFT
             for run in para.runs:
-                run.font.size = Pt(size)
+                run.font.size = Pt(actual_size)
                 run.font.bold = bold
                 run.font.name = self.p["font"]
                 run.font.color.rgb = _c(color)
