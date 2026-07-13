@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PPT Pro Studio — Console</title>
+<title>PPT Pro Studio — 控制台</title>
 <style>
   :root {
     --bg: #0D1117; --surface: #151D2E; --primary: #D4A060;
@@ -163,112 +163,112 @@
 <body>
 
 <header>
-  <h1>PPT Pro Studio <span>Console — brief editor + live preview</span></h1>
+  <h1>PPT Pro Studio <span>控制台 — 简报编辑 + 实时预览</span></h1>
   <span class="badge">v1.2.0</span>
 </header>
 
 <div class="main">
-  <!-- ===================== LEFT PANEL (Form) ===================== -->
+  <!-- ===================== 左侧面板（表单） ===================== -->
   <div class="left-panel">
 
-    <!-- 1. Template Gallery -->
+    <!-- 1. 模板市场 -->
     <div class="section">
-      <h2><span class="num">1</span>Template Market</h2>
+      <h2><span class="num">1</span>模板市场</h2>
       <div class="tmpl-grid" id="tmplGrid"></div>
     </div>
 
-    <!-- 2. Delivery Route -->
+    <!-- 2. 交付路径 -->
     <div class="section">
-      <h2><span class="num">2</span>Delivery Route</h2>
+      <h2><span class="num">2</span>交付路径</h2>
       <div class="toggle-group">
         <button class="toggle-btn active" data-delivery="editable" onclick="setDelivery('editable')">
           <span class="icon">&#9998;</span>
-          Editable PPTX
-          <span class="note">Core engine, native DrawingML</span>
+          可编辑 PPTX
+          <span class="note">核心引擎，原生可编辑</span>
         </button>
         <button class="toggle-btn" data-delivery="showcase" onclick="setDelivery('showcase')">
           <span class="icon">&#127916;</span>
-          Showcase HTML
-          <span class="note">Marp visual ceiling</span>
+          演示天花板 HTML
+          <span class="note">Marp 视觉震撼</span>
         </button>
       </div>
     </div>
 
-    <!-- 3. Brief Info -->
+    <!-- 3. 简报信息 -->
     <div class="section">
-      <h2><span class="num">3</span>Brief Info</h2>
+      <h2><span class="num">3</span>简报信息</h2>
       <div class="form-row">
         <div class="form-field">
-          <label>Topic *</label>
-          <input type="text" id="f_topic" placeholder="AI Agent Platform 2026 Roadmap" oninput="updatePreview()">
+          <label>主题 *</label>
+          <input type="text" id="f_topic" placeholder="如：AI Agent 平台 2026 路线图" oninput="updatePreview()">
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>Audience</label>
-          <input type="text" id="f_audience" placeholder="investor / student / executive" oninput="updatePreview()">
+          <label>受众</label>
+          <input type="text" id="f_audience" placeholder="如：投资人 / 学员 / 客户 / 管理层" oninput="updatePreview()">
         </div>
         <div class="form-field">
-          <label>Goal</label>
-          <input type="text" id="f_goal" placeholder="persuade / teach / inform / inspire" oninput="updatePreview()">
+          <label>目标</label>
+          <input type="text" id="f_goal" placeholder="如：说服 / 教学 / 汇报 / 销售" oninput="updatePreview()">
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>Narrative Structure</label>
+          <label>叙事结构</label>
           <select id="f_narrative" onchange="onNarrativeChange()">
-            <option value="persuade">Persuade — pain -> solution -> proof -> CTA</option>
-            <option value="inform">Inform — context -> data -> analysis -> conclusion</option>
-            <option value="teach">Teach — objective -> concept -> case -> exercise</option>
-            <option value="inspire">Inspire — mission -> story -> action -> invite</option>
+            <option value="persuade">说服型 — 痛点 → 方案 → 证明 → 行动号召</option>
+            <option value="inform">通知型 — 背景 → 数据 → 分析 → 结论</option>
+            <option value="teach">教学型 — 目标 → 概念 → 案例 → 练习</option>
+            <option value="inspire">激励型 — 愿景 → 故事 → 行动 → 邀请</option>
           </select>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>Length (pages)</label>
+          <label>页数</label>
           <input type="number" id="f_length" value="12" min="4" max="30" oninput="updatePreview()">
         </div>
         <div class="form-field">
-          <label>Sections</label>
+          <label>章节数</label>
           <input type="number" id="f_sections" value="4" min="2" max="10" oninput="updatePreview()">
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>Constraints</label>
-          <textarea id="f_constraints" placeholder="e.g. no animations, must fit 16:9, include speaker notes" oninput="updatePreview()"></textarea>
+          <label>约束条件</label>
+          <textarea id="f_constraints" placeholder="如：不要动画、必须 16:9、需要演讲者备注" oninput="updatePreview()"></textarea>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>Acceptance Criteria</label>
-          <textarea id="f_acceptance" placeholder="e.g. editable / no watermark / Chinese text OK" oninput="updatePreview()"></textarea>
+          <label>验收标准</label>
+          <textarea id="f_acceptance" placeholder="如：可编辑 / 无水印 / 中文正常" oninput="updatePreview()"></textarea>
         </div>
       </div>
     </div>
 
-    <!-- 4. Theme Picker -->
+    <!-- 4. 主题市场 -->
     <div class="section">
-      <h2><span class="num">4</span>Theme Market</h2>
+      <h2><span class="num">4</span>主题市场</h2>
       <div class="theme-grid" id="themeGrid"></div>
     </div>
 
-    <!-- 5. Page Editor -->
+    <!-- 5. 页面大纲 -->
     <div class="section">
-      <h2><span class="num">5</span>Page Outline</h2>
+      <h2><span class="num">5</span>页面大纲</h2>
       <div id="pageList"></div>
-      <button class="add-page-btn" onclick="addPage()">+ Add Page</button>
+      <button class="add-page-btn" onclick="addPage()">+ 添加页面</button>
     </div>
 
   </div><!-- /left-panel -->
 
-  <!-- ===================== RIGHT PANEL (Preview + Export) ===================== -->
+  <!-- ===================== 右侧面板（预览 + 导出） ===================== -->
   <div class="right-panel">
 
-    <!-- Live Preview -->
+    <!-- 实时预览 -->
     <div class="section">
-      <h2>Live Preview</h2>
+      <h2>实时预览</h2>
       <div class="preview-slide" id="previewSlide">
         <div class="slide-content" id="previewContent"></div>
       </div>
@@ -279,21 +279,21 @@
       </div>
     </div>
 
-    <!-- Export -->
+    <!-- 导出 -->
     <div class="section">
-      <h2>Export &amp; Generate</h2>
+      <h2>导出与生成</h2>
       <div class="export-panel">
-        <button class="export-btn btn-primary" onclick="downloadBrief()">&#11015; Download brief.json</button>
-        <button class="export-btn btn-secondary" onclick="copyBrief()">&#128203; Copy JSON</button>
-        <button class="export-btn btn-outline" onclick="copyCommand()">&#128203; Copy Command</button>
-        <div style="margin-top: 12px; font-size: 13px; color: var(--muted);">Run this command to generate:</div>
+        <button class="export-btn btn-primary" onclick="downloadBrief()">&#11015; 下载 brief.json</button>
+        <button class="export-btn btn-secondary" onclick="copyBrief()">&#128203; 复制 JSON</button>
+        <button class="export-btn btn-outline" onclick="copyCommand()">&#128203; 复制命令</button>
+        <div style="margin-top: 12px; font-size: 13px; color: var(--muted);">运行以下命令生成 PPT：</div>
         <div class="cmd-box" id="cmdBox"></div>
       </div>
     </div>
 
-    <!-- Brief JSON (read-only view) -->
+    <!-- Brief JSON 只读视图 -->
     <div class="section">
-      <h2>Brief JSON</h2>
+      <h2>简报 JSON</h2>
       <div class="cmd-box" id="jsonView" style="max-height: 300px; overflow-y: auto;"></div>
     </div>
 
@@ -304,151 +304,158 @@
 
 <script>
 // =====================================================================
-// DATA: themes and templates (mirrors theme_market.py / template_market.py)
+// 数据：主题与模板（与 theme_market.py / template_market.py 同步）
 // =====================================================================
 const THEMES = {
-  tech_dark: { label:"Tech Dark", bg:"0D1117", surface:"151D2E", primary:"D4A060", secondary:"58A6FF", text:"FFFFFF", muted:"8B949E", accent:"3FB950", line:"30363D" },
-  business_blue: { label:"Business Blue", bg:"FFFFFF", surface:"F2F6FC", primary:"1F4E79", secondary:"2E75B6", text:"1A1A1A", muted:"5A5A5A", accent:"C55A11", line:"D6E0F0" },
-  creative_purple: { label:"Creative Purple", bg:"1B1033", surface:"2A1B4A", primary:"C77DFF", secondary:"7B2FBE", text:"F5EEFF", muted:"B39DCE", accent:"FF8FB1", line:"3D2A63" },
-  academic_white: { label:"Academic White", bg:"FFFFFF", surface:"FAFAFA", primary:"202020", secondary:"006633", text:"1A1A1A", muted:"666666", accent:"B00020", line:"DDDDDD" },
-  minimal_gray: { label:"Minimal Gray", bg:"FAFAFA", surface:"F0F0F0", primary:"222222", secondary:"666666", text:"1A1A1A", muted:"999999", accent:"007ACC", line:"E0E0E0" },
-  fintech_green: { label:"Fintech Green", bg:"0B1F17", surface:"122B20", primary:"2EA66B", secondary:"4FD1A1", text:"EAF6F0", muted:"7FA593", accent:"F2B705", line:"1E3A2C" },
-  sunset_orange: { label:"Sunset Orange", bg:"1A1206", surface:"2A1D0C", primary:"E8843C", secondary:"F2B705", text:"FFF3E6", muted:"B58A5E", accent:"5BC0EB", line:"3A2A14" },
-  mono_ink: { label:"Mono Ink", bg:"0A0A0A", surface:"161616", primary:"FFFFFF", secondary:"A0A0A0", text:"FFFFFF", muted:"7A7A7A", accent:"FF4D4D", line:"2A2A2A" },
-  guochao_red: { label:"Guochao Red", bg:"1A0808", surface:"2A1010", primary:"C8102E", secondary:"2A9D8F", text:"FBF3E8", muted:"B8897A", accent:"E8B04B", line:"3D1A1A" },
-  medical_blue: { label:"Medical Blue", bg:"F4F9FC", surface:"E3F0F8", primary:"0B6E9E", secondary:"16A2C7", text:"1A2B36", muted:"5B7C8D", accent:"2EA66B", line:"C9E2F0" },
-  ecommerce_orange: { label:"E-commerce Orange", bg:"FFF7F0", surface:"FFE9D6", primary:"FF6A00", secondary:"FF3D77", text:"2B1A12", muted:"9A7B68", accent:"FFC400", line:"FFD9BE" },
-  gov_red: { label:"Official Red", bg:"FFFFFF", surface:"FBEAEC", primary:"C8102E", secondary:"9E1B32", text:"1A1A1A", muted:"6B6B6B", accent:"D4AF37", line:"E6C9CE" },
+  tech_dark: { label:"深色科技风", bg:"0D1117", surface:"151D2E", primary:"D4A060", secondary:"58A6FF", text:"FFFFFF", muted:"8B949E", accent:"3FB950", line:"30363D" },
+  business_blue: { label:"商务蓝", bg:"FFFFFF", surface:"F2F6FC", primary:"1F4E79", secondary:"2E75B6", text:"1A1A1A", muted:"5A5A5A", accent:"C55A11", line:"D6E0F0" },
+  creative_purple: { label:"创意紫", bg:"1B1033", surface:"2A1B4A", primary:"C77DFF", secondary:"7B2FBE", text:"F5EEFF", muted:"B39DCE", accent:"FF8FB1", line:"3D2A63" },
+  academic_white: { label:"学术白", bg:"FFFFFF", surface:"FAFAFA", primary:"202020", secondary:"006633", text:"1A1A1A", muted:"666666", accent:"B00020", line:"DDDDDD" },
+  minimal_gray: { label:"简约灰", bg:"FAFAFA", surface:"F0F0F0", primary:"222222", secondary:"666666", text:"1A1A1A", muted:"999999", accent:"007ACC", line:"E0E0E0" },
+  fintech_green: { label:"金融绿", bg:"0B1F17", surface:"122B20", primary:"2EA66B", secondary:"4FD1A1", text:"EAF6F0", muted:"7FA593", accent:"F2B705", line:"1E3A2C" },
+  sunset_orange: { label:"暖阳橙", bg:"1A1206", surface:"2A1D0C", primary:"E8843C", secondary:"F2B705", text:"FFF3E6", muted:"B58A5E", accent:"5BC0EB", line:"3A2A14" },
+  mono_ink: { label:"极简墨", bg:"0A0A0A", surface:"161616", primary:"FFFFFF", secondary:"A0A0A0", text:"FFFFFF", muted:"7A7A7A", accent:"FF4D4D", line:"2A2A2A" },
+  guochao_red: { label:"国潮红", bg:"1A0808", surface:"2A1010", primary:"C8102E", secondary:"2A9D8F", text:"FBF3E8", muted:"B8897A", accent:"E8B04B", line:"3D1A1A" },
+  medical_blue: { label:"医疗蓝", bg:"F4F9FC", surface:"E3F0F8", primary:"0B6E9E", secondary:"16A2C7", text:"1A2B36", muted:"5B7C8D", accent:"2EA66B", line:"C9E2F0" },
+  ecommerce_orange: { label:"电商橙", bg:"FFF7F0", surface:"FFE9D6", primary:"FF6A00", secondary:"FF3D77", text:"2B1A12", muted:"9A7B68", accent:"FFC400", line:"FFD9BE" },
+  gov_red: { label:"党政红", bg:"FFFFFF", surface:"FBEAEC", primary:"C8102E", secondary:"9E1B32", text:"1A1A1A", muted:"6B6B6B", accent:"D4AF37", line:"E6C9CE" },
 };
 
 const TEMPLATES = {
-  startup_pitch: { label:"Startup Pitch", desc:"Investor pitch: pain -> solution -> proof -> ROI -> CTA", theme:"tech_dark", narrative:"persuade", delivery:"editable", pages:[
-    {type:"cover",title:"Company + one-line value prop"},
-    {type:"section",title:"01 Pain Point"},
-    {type:"content",title:"Why it hurts now",items:["Pain 1","Pain 2","Pain 3"]},
-    {type:"content",title:"Why now",items:["Trend","Catalyst"]},
-    {type:"content",title:"Our solution",items:["Core diff","Tech moat"]},
-    {type:"media",title:"Proof: data / cases / logos",items:["Key metric","Logo"]},
-    {type:"chart",title:"Value / ROI"},
-    {type:"summary",title:"Call to action"},
+  startup_pitch: { label:"融资路演", desc:"投资人路演：痛点 → 方案 → 证明 → ROI → 行动号召", theme:"tech_dark", narrative:"persuade", delivery:"editable", pages:[
+    {type:"cover",title:"公司名 + 一句话价值主张"},
+    {type:"section",title:"01 痛点"},
+    {type:"content",title:"现状为什么痛",items:["痛点一","痛点二","痛点三"]},
+    {type:"content",title:"为什么是现在",items:["趋势/窗口","催化剂"]},
+    {type:"content",title:"我们的方案",items:["核心差异","技术壁垒"]},
+    {type:"media",title:"证明：数据 / 案例 / 客户",items:["关键指标","标杆客户"]},
+    {type:"chart",title:"价值 / ROI 量化"},
+    {type:"summary",title:"行动号召（投资 / 合作）"},
   ]},
-  course_lecture: { label:"Course Lecture", desc:"Training: objective -> concept -> case -> exercise -> recap", theme:"academic_white", narrative:"teach", delivery:"editable", pages:[
-    {type:"cover",title:"Course title"},
-    {type:"section",title:"Learning objectives"},
-    {type:"content",title:"Core concepts",items:["Concept A","Concept B"]},
-    {type:"content",title:"Principles",items:["Principle 1","Principle 2"]},
-    {type:"media",title:"Real-world case",items:["Scenario","Steps"]},
-    {type:"two_column",title:"Exercise",items:["Problem","Approach"]},
-    {type:"summary",title:"Recap + further reading"},
+  course_lecture: { label:"课程课件", desc:"培训/教学：目标 → 概念 → 原理 → 案例 → 练习 → 小结", theme:"academic_white", narrative:"teach", delivery:"editable", pages:[
+    {type:"cover",title:"课程名"},
+    {type:"section",title:"学习目标"},
+    {type:"content",title:"核心概念",items:["概念一","概念二"]},
+    {type:"content",title:"原理解析",items:["原理一","原理二"]},
+    {type:"media",title:"实战案例",items:["场景","步骤"]},
+    {type:"two_column",title:"随堂练习",items:["题目","思路"]},
+    {type:"summary",title:"小结 + 拓展阅读"},
   ]},
-  annual_review: { label:"Annual Review", desc:"Year-end report: context -> progress -> issues -> next", theme:"business_blue", narrative:"inform", delivery:"editable", pages:[
-    {type:"cover",title:"2025 Annual Review"},
-    {type:"agenda",title:"Agenda"},
-    {type:"content",title:"Background / goals"},
-    {type:"chart",title:"Key progress (data)"},
-    {type:"two_column",title:"Issues",items:["Cause","Impact"]},
-    {type:"summary",title:"Conclusion"},
-    {type:"contact",title:"Next steps / owners"},
+  annual_review: { label:"年度复盘", desc:"年终汇报：背景 → 进展 → 问题 → 结论 → 下一步", theme:"business_blue", narrative:"inform", delivery:"editable", pages:[
+    {type:"cover",title:"2025 年度复盘"},
+    {type:"agenda",title:"议程"},
+    {type:"content",title:"背景 / 目标"},
+    {type:"chart",title:"关键进展（数据）"},
+    {type:"two_column",title:"问题分析",items:["原因","影响"]},
+    {type:"summary",title:"结论"},
+    {type:"contact",title:"下一步 / 负责人"},
   ]},
-  product_launch: { label:"Product Launch", desc:"Launch event: vision -> resonance -> action (showcase)", theme:"creative_purple", narrative:"inspire", delivery:"showcase", pages:[
-    {type:"cover",title:"Product + launch statement"},
-    {type:"quote",title:"We believe..."},
-    {type:"content",title:"User resonance story"},
-    {type:"section",title:"New capabilities"},
-    {type:"content",title:"Key highlights",items:["Highlight 1","Highlight 2","Highlight 3"]},
-    {type:"media",title:"Live demo"},
-    {type:"summary",title:"Invitation"},
+  product_launch: { label:"产品发布", desc:"发布会/品牌发布：愿景 → 共鸣 → 行动 → 号召（视觉天花板）", theme:"creative_purple", narrative:"inspire", delivery:"showcase", pages:[
+    {type:"cover",title:"产品名 + 发布主张"},
+    {type:"quote",title:"我们相信……"},
+    {type:"content",title:"用户共鸣故事"},
+    {type:"section",title:"全新能力"},
+    {type:"content",title:"核心亮点",items:["亮点一","亮点二","亮点三"]},
+    {type:"media",title:"实景演示"},
+    {type:"summary",title:"邀请体验"},
   ]},
-  xhs_knowledge: { label:"XHS Knowledge", desc:"Social media knowledge card: pain -> tips -> checklist", theme:"sunset_orange", narrative:"inform", delivery:"showcase", pages:[
-    {type:"cover",title:"Catchy title + cover"},
-    {type:"content",title:"Do you also... (pain)"},
-    {type:"content",title:"3 methods",items:["Method 1","Method 2","Method 3"]},
-    {type:"two_column",title:"Pitfall checklist",items:["Don't","Do"]},
-    {type:"summary",title:"Save + follow"},
+  xhs_knowledge: { label:"小红书知识卡", desc:"种草/知识科普：痛点 → 方法 → 清单（视觉吸睛）", theme:"sunset_orange", narrative:"inform", delivery:"showcase", pages:[
+    {type:"cover",title:"标题党金句 + 封面"},
+    {type:"content",title:"你是不是也……（痛点）"},
+    {type:"content",title:"3 个方法",items:["方法一","方法二","方法三"]},
+    {type:"two_column",title:"避坑清单",items:["别做","要做"]},
+    {type:"summary",title:"收藏 + 关注引导"},
   ]},
-  gov_report: { label:"Official Report", desc:"Gov/SOE report: context -> results -> experience -> plan", theme:"gov_red", narrative:"inform", delivery:"editable", pages:[
-    {type:"cover",title:"Report title"},
-    {type:"section",title:"I. Background"},
-    {type:"content",title:"Key results",items:["Result 1","Result 2"]},
-    {type:"chart",title:"Data support"},
-    {type:"content",title:"Best practices",items:["Practice 1","Practice 2"]},
-    {type:"summary",title:"Next steps"},
+  gov_report: { label:"党政汇报", desc:"国企/党政汇报：背景 → 成效 → 经验 → 计划（正式庄重）", theme:"gov_red", narrative:"inform", delivery:"editable", pages:[
+    {type:"cover",title:"汇报主题"},
+    {type:"section",title:"一、工作背景"},
+    {type:"content",title:"主要成效",items:["成效一","成效二"]},
+    {type:"chart",title:"数据支撑"},
+    {type:"content",title:"经验做法",items:["做法一","做法二"]},
+    {type:"summary",title:"下一步计划"},
   ]},
-  medical_science: { label:"Medical Science", desc:"Health education: concept -> mechanism -> advice", theme:"medical_blue", narrative:"teach", delivery:"editable", pages:[
-    {type:"cover",title:"Topic"},
-    {type:"section",title:"Learning objectives"},
-    {type:"content",title:"Core concept",items:["Point 1","Point 2"]},
-    {type:"content",title:"Mechanism",items:["Mechanism 1","Mechanism 2"]},
-    {type:"media",title:"Diagram / case"},
-    {type:"summary",title:"Health advice"},
+  medical_science: { label:"医疗科普", desc:"健康/医学科普：概念 → 原理 → 建议", theme:"medical_blue", narrative:"teach", delivery:"editable", pages:[
+    {type:"cover",title:"科普主题"},
+    {type:"section",title:"学习目标"},
+    {type:"content",title:"核心概念",items:["概念一","概念二"]},
+    {type:"content",title:"发生原理",items:["机制一","机制二"]},
+    {type:"media",title:"图示 / 案例"},
+    {type:"summary",title:"健康建议"},
   ]},
-  ecom_promo: { label:"E-com Promo", desc:"Promo: benefit -> hero product -> countdown (conversion)", theme:"ecommerce_orange", narrative:"inspire", delivery:"showcase", pages:[
-    {type:"cover",title:"Promo + key benefit"},
-    {type:"content",title:"Why buy",items:["Pain","Gain"]},
-    {type:"media",title:"Hero product"},
-    {type:"chart",title:"Price / discount"},
-    {type:"summary",title:"Buy now (countdown)"},
+  ecom_promo: { label:"电商大促", desc:"直播/大促主视觉：利益点 → 爆款 → 倒计时（转化导向）", theme:"ecommerce_orange", narrative:"inspire", delivery:"showcase", pages:[
+    {type:"cover",title:"大促主视觉 + 利益点"},
+    {type:"content",title:"为什么买",items:["痛点","爽点"]},
+    {type:"media",title:"爆款展示"},
+    {type:"chart",title:"价格对比 / 折扣力度"},
+    {type:"summary",title:"立即抢购（倒计时）"},
   ]},
-  guochao_brand: { label:"Guochao Brand", desc:"Heritage brand: culture -> craft -> statement (showcase)", theme:"guochao_red", narrative:"inspire", delivery:"showcase", pages:[
-    {type:"cover",title:"Brand + cultural statement"},
-    {type:"quote",title:"Eastern aesthetics, modern expression"},
-    {type:"content",title:"Cultural roots",items:["Element 1","Element 2"]},
-    {type:"media",title:"Craftsmanship"},
-    {type:"summary",title:"Invitation"},
+  guochao_brand: { label:"国潮品牌", desc:"国风品牌故事：文化 → 匠心 → 主张（视觉天花板）", theme:"guochao_red", narrative:"inspire", delivery:"showcase", pages:[
+    {type:"cover",title:"品牌名 + 文化主张"},
+    {type:"quote",title:"东方美学 · 当代表达"},
+    {type:"content",title:"文化溯源",items:["元素一","元素二"]},
+    {type:"media",title:"匠心工艺"},
+    {type:"summary",title:"邀请共赏"},
   ]},
-  fintech_report: { label:"Fintech Report", desc:"Industry report: summary -> data -> conclusion", theme:"fintech_green", narrative:"inform", delivery:"editable", pages:[
-    {type:"cover",title:"Report title"},
-    {type:"section",title:"Summary"},
-    {type:"chart",title:"Core data"},
-    {type:"content",title:"Trends",items:["Trend 1","Trend 2"]},
-    {type:"two_column",title:"Risk vs opportunity",items:["Risk","Opportunity"]},
-    {type:"summary",title:"Investment advice"},
+  fintech_report: { label:"金融研报", desc:"行业/数据研报：摘要 → 数据 → 结论", theme:"fintech_green", narrative:"inform", delivery:"editable", pages:[
+    {type:"cover",title:"研报标题"},
+    {type:"section",title:"摘要"},
+    {type:"chart",title:"核心数据"},
+    {type:"content",title:"趋势判断",items:["判断一","判断二"]},
+    {type:"two_column",title:"风险与机会",items:["风险","机会"]},
+    {type:"summary",title:"投资建议"},
   ]},
 };
 
 const NARRATIVE_SKELETONS = {
   persuade: [
-    {type:"cover",purpose:"Cover + one-line value prop"},
-    {type:"section",purpose:"Pain: why it hurts"},
-    {type:"content",purpose:"Why now (trend/window)"},
-    {type:"content",purpose:"Our solution (core diff)"},
-    {type:"media",purpose:"Proof: data / cases / logos"},
-    {type:"chart",purpose:"Value / ROI"},
-    {type:"summary",purpose:"Call to action"},
+    {type:"cover",purpose:"封面 + 一句话价值主张"},
+    {type:"section",purpose:"痛点：现状为什么痛"},
+    {type:"content",purpose:"为什么是现在（趋势/窗口）"},
+    {type:"content",purpose:"我们的方案（核心差异）"},
+    {type:"media",purpose:"证明：数据 / 案例 / 客户"},
+    {type:"chart",purpose:"价值 / ROI 量化"},
+    {type:"summary",purpose:"行动号召（试用 / 投资 / 合作）"},
   ],
   inform: [
-    {type:"cover",purpose:"Cover + topic"},
-    {type:"agenda",purpose:"Agenda"},
-    {type:"content",purpose:"Background / goals"},
-    {type:"chart",purpose:"Key progress (data)"},
-    {type:"two_column",purpose:"Problem analysis"},
-    {type:"summary",purpose:"Conclusion"},
-    {type:"contact",purpose:"Next steps / owners"},
+    {type:"cover",purpose:"封面 + 本期主题"},
+    {type:"agenda",purpose:"议程"},
+    {type:"content",purpose:"背景 / 目标"},
+    {type:"chart",purpose:"关键进展（数据）"},
+    {type:"two_column",purpose:"问题分析（左因 / 右果）"},
+    {type:"summary",purpose:"结论"},
+    {type:"contact",purpose:"下一步 / 负责人"},
   ],
   teach: [
-    {type:"cover",purpose:"Cover + course name"},
-    {type:"section",purpose:"Learning objectives"},
-    {type:"content",purpose:"Core concepts"},
-    {type:"content",purpose:"Principles"},
-    {type:"media",purpose:"Real-world case"},
-    {type:"two_column",purpose:"Exercise"},
-    {type:"summary",purpose:"Recap + further reading"},
+    {type:"cover",purpose:"封面 + 课程名"},
+    {type:"section",purpose:"学习目标"},
+    {type:"content",purpose:"核心概念"},
+    {type:"content",purpose:"原理解析"},
+    {type:"media",purpose:"实战案例"},
+    {type:"two_column",purpose:"随堂练习（左题 / 右思路）"},
+    {type:"summary",purpose:"小结 + 拓展阅读"},
   ],
   inspire: [
-    {type:"cover",purpose:"Cover + mission statement"},
-    {type:"quote",purpose:"Vision / mission"},
-    {type:"content",purpose:"Resonance story"},
-    {type:"section",purpose:"Challenge / opportunity"},
-    {type:"content",purpose:"Our action"},
-    {type:"summary",purpose:"Invitation"},
-    {type:"contact",purpose:"How to join"},
+    {type:"cover",purpose:"封面 + 使命金句"},
+    {type:"quote",purpose:"愿景 / 使命"},
+    {type:"content",purpose:"共鸣故事"},
+    {type:"section",purpose:"挑战 / 机遇"},
+    {type:"content",purpose:"我们的行动"},
+    {type:"summary",purpose:"邀请同行（号召）"},
+    {type:"contact",purpose:"加入方式"},
   ],
 };
 
 const PAGE_TYPES = ["cover","section","content","two_column","media","chart","table","timeline","quote","agenda","summary","contact"];
+const PAGE_TYPE_LABELS = {
+  cover:"封面", section:"章节", content:"内容", two_column:"双栏",
+  media:"图文", chart:"图表", table:"表格", timeline:"时间线",
+  quote:"金句", agenda:"议程", summary:"总结", contact:"联系方式",
+};
+const NARRATIVE_LABELS = { persuade:"说服型", inform:"通知型", teach:"教学型", inspire:"激励型" };
+const DELIVERY_LABELS = { editable:"可编辑", showcase:"演示天花板" };
 
 // =====================================================================
-// STATE
+// 状态
 // =====================================================================
 let state = {
   template: null,
@@ -460,18 +467,17 @@ let state = {
 };
 
 // =====================================================================
-// INIT
+// 初始化
 // =====================================================================
 function init() {
   renderTemplateGrid();
   renderThemeGrid();
-  // start with a default template
   applyTemplate("startup_pitch");
   updatePreview();
 }
 
 // =====================================================================
-// TEMPLATE GALLERY
+// 模板市场
 // =====================================================================
 function renderTemplateGrid() {
   const grid = document.getElementById("tmplGrid");
@@ -484,9 +490,9 @@ function renderTemplateGrid() {
       <div class="label">${t.label}</div>
       <div class="desc">${t.desc}</div>
       <div class="meta">
-        <span>${t.narrative}</span>
-        <span>${t.delivery}</span>
-        <span>${t.pages.length}p</span>
+        <span>${NARRATIVE_LABELS[t.narrative]}</span>
+        <span>${DELIVERY_LABELS[t.delivery]}</span>
+        <span>${t.pages.length} 页</span>
       </div>`;
     card.onclick = () => applyTemplate(id);
     grid.appendChild(card);
@@ -503,36 +509,31 @@ function applyTemplate(id) {
   state.pages = JSON.parse(JSON.stringify(t.pages));
   state.previewPage = 0;
 
-  // update active card
   document.querySelectorAll(".tmpl-card").forEach(c => {
     c.classList.toggle("active", c.dataset.id === id);
   });
 
-  // sync form
   document.getElementById("f_topic").value = t.label;
   document.getElementById("f_audience").value = "";
-  document.getElementById("f_goal").value = t.narrative;
+  document.getElementById("f_goal").value = NARRATIVE_LABELS[t.narrative];
   document.getElementById("f_narrative").value = t.narrative;
   document.getElementById("f_length").value = t.pages.length;
   document.getElementById("f_sections").value = Math.max(3, Math.min(6, Math.floor(t.pages.length / 2)));
   document.getElementById("f_constraints").value = "";
   document.getElementById("f_acceptance").value =
-    t.delivery === "editable" ? "editable / no watermark / Chinese OK" : "visually stunning, presentation-ready";
+    t.delivery === "editable" ? "可编辑 / 无水印 / 中文正常" : "视觉震撼，适合演示/路演";
 
-  // sync delivery toggle
   document.querySelectorAll(".toggle-btn").forEach(b => {
     b.classList.toggle("active", b.dataset.delivery === state.delivery);
   });
 
-  // sync theme
   renderThemeGrid();
-
   renderPages();
   updatePreview();
 }
 
 // =====================================================================
-// DELIVERY TOGGLE
+// 交付路径切换
 // =====================================================================
 function setDelivery(d) {
   state.delivery = d;
@@ -540,12 +541,12 @@ function setDelivery(d) {
     b.classList.toggle("active", b.dataset.delivery === d);
   });
   document.getElementById("f_acceptance").value =
-    d === "editable" ? "editable / no watermark / Chinese OK" : "visually stunning, presentation-ready";
+    d === "editable" ? "可编辑 / 无水印 / 中文正常" : "视觉震撼，适合演示/路演";
   updatePreview();
 }
 
 // =====================================================================
-// THEME PICKER
+// 主题市场
 // =====================================================================
 function renderThemeGrid() {
   const grid = document.getElementById("themeGrid");
@@ -571,16 +572,14 @@ function renderThemeGrid() {
 }
 
 // =====================================================================
-// NARRATIVE CHANGE -> rebuild pages from skeleton
+// 叙事结构切换 → 按骨架重建页面
 // =====================================================================
 function onNarrativeChange() {
   const n = document.getElementById("f_narrative").value;
   state.narrative = n;
   const skeleton = NARRATIVE_SKELETONS[n];
   if (!skeleton) return;
-  // keep existing page titles if count matches, else rebuild
   if (state.pages.length === skeleton.length) {
-    // just update types
     state.pages.forEach((pg, i) => { pg.type = skeleton[i].type; });
   } else {
     state.pages = skeleton.map(s => ({ type: s.type, title: s.purpose, items: [] }));
@@ -592,7 +591,7 @@ function onNarrativeChange() {
 }
 
 // =====================================================================
-// PAGE EDITOR
+// 页面编辑器
 // =====================================================================
 function renderPages() {
   const list = document.getElementById("pageList");
@@ -601,12 +600,12 @@ function renderPages() {
     const div = document.createElement("div");
     div.className = "page-item";
     let typeOpts = PAGE_TYPES.map(t =>
-      `<option value="${t}" ${t === pg.type ? "selected" : ""}>${t}</option>`
+      `<option value="${t}" ${t === pg.type ? "selected" : ""}>${PAGE_TYPE_LABELS[t]}</option>`
     ).join("");
     div.innerHTML = `
       <div class="pg-num">${i + 1}</div>
       <select onchange="updatePageType(${i}, this.value)">${typeOpts}</select>
-      <input type="text" value="${escHtml(pg.title || "")}" placeholder="Page title"
+      <input type="text" value="${escHtml(pg.title || "")}" placeholder="页面标题"
              oninput="updatePageTitle(${i}, this.value)">
       <button class="del-btn" onclick="delPage(${i})">&times;</button>`;
     list.appendChild(div);
@@ -630,7 +629,7 @@ function updatePageType(i, val) { state.pages[i].type = val; updatePreview(); }
 function updatePageTitle(i, val) { state.pages[i].title = val; updatePreview(); }
 
 // =====================================================================
-// BUILD BRIAF JSON
+// 构建 Brief JSON
 // =====================================================================
 function buildBrief() {
   return {
@@ -652,7 +651,7 @@ function buildBrief() {
 function val(id) { return document.getElementById(id).value.trim(); }
 
 // =====================================================================
-// LIVE PREVIEW
+// 实时预览
 // =====================================================================
 function updatePreview() {
   const brief = buildBrief();
@@ -660,13 +659,11 @@ function updatePreview() {
   const slide = document.getElementById("previewSlide");
   const content = document.getElementById("previewContent");
 
-  // apply theme to slide background
   slide.style.background = `#${theme.bg}`;
 
   const pgIdx = Math.min(state.previewPage, state.pages.length - 1);
   const pg = state.pages[pgIdx] || { type: "cover", title: brief.topic };
 
-  // build slide content by type
   let html = "";
   const titleColor = `#${theme.primary}`;
   const textColor = `#${theme.text}`;
@@ -679,16 +676,16 @@ function updatePreview() {
     case "cover":
       html = `
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-          <div style="font-size:11px; color:${accentColor}; letter-spacing:3px; margin-bottom:8px; text-transform:uppercase;">${escHtml(brief.topic || "Untitled")}</div>
-          <div style="font-size:28px; font-weight:700; color:${titleColor}; line-height:1.3;">${escHtml(pg.title || "Slide Title")}</div>
-          ${brief.audience ? `<div style="font-size:13px; color:${mutedColor}; margin-top:12px;">for ${escHtml(brief.audience)}</div>` : ""}
+          <div style="font-size:11px; color:${accentColor}; letter-spacing:3px; margin-bottom:8px;">${escHtml(brief.topic || "未命名")}</div>
+          <div style="font-size:28px; font-weight:700; color:${titleColor}; line-height:1.3;">${escHtml(pg.title || "幻灯片标题")}</div>
+          ${brief.audience ? `<div style="font-size:13px; color:${mutedColor}; margin-top:12px;">面向 ${escHtml(brief.audience)}</div>` : ""}
         </div>`;
       break;
     case "section":
       html = `
         <div style="flex:1; display:flex; align-items:center;">
           <div style="border-left:4px solid ${accentColor}; padding-left:20px;">
-            <div style="font-size:48px; font-weight:800; color:${titleColor};">${escHtml(pg.title || "Section")}</div>
+            <div style="font-size:48px; font-weight:800; color:${titleColor};">${escHtml(pg.title || "章节")}</div>
             <div style="font-size:14px; color:${mutedColor}; margin-top:8px;">${escHtml(brief.topic || "")}</div>
           </div>
         </div>`;
@@ -697,46 +694,46 @@ function updatePreview() {
       html = `
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
           <div style="font-size:36px; color:${accentColor}; margin-bottom:8px;">&ldquo;</div>
-          <div style="font-size:22px; font-weight:600; color:${textColor}; line-height:1.5; max-width:80%;">${escHtml(pg.title || "Quote")}</div>
+          <div style="font-size:22px; font-weight:600; color:${textColor}; line-height:1.5; max-width:80%;">${escHtml(pg.title || "金句")}</div>
           <div style="font-size:13px; color:${mutedColor}; margin-top:16px;">&mdash; ${escHtml(brief.topic || "")}</div>
         </div>`;
       break;
     case "content":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px; border-bottom:2px solid ${surfaceColor}; padding-bottom:8px;">${escHtml(pg.title || "Content")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px; border-bottom:2px solid ${surfaceColor}; padding-bottom:8px;">${escHtml(pg.title || "内容")}</div>
         <div style="flex:1;">
           ${(pg.items||[]).map((item, i) => `
             <div style="display:flex; align-items:start; gap:10px; margin-bottom:10px;">
               <div style="background:${accentColor}; color:#${theme.bg}; font-size:11px; font-weight:700; width:20px; height:20px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;">${i+1}</div>
               <div style="font-size:14px; color:${textColor};">${escHtml(item)}</div>
             </div>`).join("")}
-          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px; color:${mutedColor};">Add bullet points in page items...</div>` : ""}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px; color:${mutedColor};">添加要点到此页面……</div>` : ""}
         </div>`;
       break;
     case "two_column":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "Two Column")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "双栏")}</div>
         <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div style="background:${surfaceColor}; border-radius:8px; padding:16px;">
-            <div style="font-size:12px; color:${secondaryColor}; font-weight:600; margin-bottom:8px;">LEFT</div>
-            <div style="font-size:14px; color:${textColor};">${escHtml((pg.items||[])[0] || "...")}</div>
+            <div style="font-size:12px; color:${secondaryColor}; font-weight:600; margin-bottom:8px;">左栏</div>
+            <div style="font-size:14px; color:${textColor};">${escHtml((pg.items||[])[0] || "……")}</div>
           </div>
           <div style="background:${surfaceColor}; border-radius:8px; padding:16px;">
-            <div style="font-size:12px; color:${accentColor}; font-weight:600; margin-bottom:8px;">RIGHT</div>
-            <div style="font-size:14px; color:${textColor};">${escHtml((pg.items||[])[1] || "...")}</div>
+            <div style="font-size:12px; color:${accentColor}; font-weight:600; margin-bottom:8px;">右栏</div>
+            <div style="font-size:14px; color:${textColor};">${escHtml((pg.items||[])[1] || "……")}</div>
           </div>
         </div>`;
       break;
     case "media":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "Media")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "图文")}</div>
         <div style="flex:1; background:${surfaceColor}; border-radius:8px; display:flex; align-items:center; justify-content:center;">
           <div style="font-size:40px; opacity:.3;">&#128247;</div>
         </div>`;
       break;
     case "chart":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "Chart")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "图表")}</div>
         <div style="flex:1; background:${surfaceColor}; border-radius:8px; padding:16px; display:flex; align-items:flex-end; gap:12px;">
           <div style="flex:1; background:${secondaryColor}; border-radius:4px 4px 0 0; height:60%;"></div>
           <div style="flex:1; background:${accentColor}; border-radius:4px 4px 0 0; height:85%;"></div>
@@ -746,26 +743,26 @@ function updatePreview() {
       break;
     case "agenda":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "Agenda")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "议程")}</div>
         <div style="flex:1;">
           ${["01","02","03","04"].map((n,i) => `
             <div style="display:flex; gap:12px; margin-bottom:10px; align-items:center;">
               <span style="font-size:20px; font-weight:800; color:${accentColor};">${n}</span>
-              <span style="font-size:14px; color:${textColor};">Agenda item ${i+1}</span>
+              <span style="font-size:14px; color:${textColor};">议程项 ${i+1}</span>
             </div>`).join("")}
         </div>`;
       break;
     case "summary":
       html = `
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-          <div style="font-size:11px; color:${accentColor}; letter-spacing:3px; margin-bottom:8px;">SUMMARY</div>
-          <div style="font-size:26px; font-weight:700; color:${titleColor}; line-height:1.3;">${escHtml(pg.title || "Summary")}</div>
-          <div style="margin-top:20px; padding:10px 24px; background:${accentColor}; color:#${theme.bg}; border-radius:24px; font-size:14px; font-weight:600;">Call to Action</div>
+          <div style="font-size:11px; color:${accentColor}; letter-spacing:3px; margin-bottom:8px;">总结</div>
+          <div style="font-size:26px; font-weight:700; color:${titleColor}; line-height:1.3;">${escHtml(pg.title || "总结")}</div>
+          <div style="margin-top:20px; padding:10px 24px; background:${accentColor}; color:#${theme.bg}; border-radius:24px; font-size:14px; font-weight:600;">行动号召</div>
         </div>`;
       break;
     case "contact":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "Contact")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "联系方式")}</div>
         <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px;">
           <div style="font-size:14px; color:${textColor};">&#9742; contact@example.com</div>
           <div style="font-size:14px; color:${mutedColor};">&#127759; www.example.com</div>
@@ -773,10 +770,10 @@ function updatePreview() {
       break;
     case "table":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "Table")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "表格")}</div>
         <div style="flex:1; background:${surfaceColor}; border-radius:8px; padding:12px;">
           <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:${surfaceColor};">
-            ${["Col A","Col B","Col C","---","---","---","---","---","---"].map((c,i) =>
+            ${["列 A","列 B","列 C","——","——","——","——","——","——"].map((c,i) =>
               `<div style="background:#${theme.bg}; padding:8px; font-size:12px; color:${i<3?accentColor:textColor}; font-weight:${i<3?600:400};">${c}</div>`
             ).join("")}
           </div>
@@ -784,7 +781,7 @@ function updatePreview() {
       break;
     case "timeline":
       html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "Timeline")}</div>
+        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "时间线")}</div>
         <div style="flex:1; display:flex; align-items:center; justify-content:space-around; position:relative;">
           <div style="position:absolute; left:10%; right:10%; top:50%; height:2px; background:${accentColor};"></div>
           ${["Q1","Q2","Q3","Q4"].map(q => `
@@ -795,20 +792,17 @@ function updatePreview() {
         </div>`;
       break;
     default:
-      html = `<div style="font-size:20px; color:${titleColor};">${escHtml(pg.title || "Slide")}</div>`;
+      html = `<div style="font-size:20px; color:${titleColor};">${escHtml(pg.title || "幻灯片")}</div>`;
   }
 
   content.innerHTML = html;
 
-  // page info
   document.getElementById("pgInfo").textContent =
     `${pgIdx + 1} / ${state.pages.length}`;
 
-  // update JSON view
   document.getElementById("jsonView").textContent =
     JSON.stringify(brief, null, 2);
 
-  // update command
   const ext = state.delivery === "showcase" ? "html" : "pptx";
   document.getElementById("cmdBox").textContent =
     `python3 scripts/generate.py brief.json --out output/deck.${ext}`;
@@ -822,7 +816,7 @@ function nextPreviewPage() {
 }
 
 // =====================================================================
-// EXPORT
+// 导出
 // =====================================================================
 function downloadBrief() {
   const brief = buildBrief();
@@ -832,14 +826,14 @@ function downloadBrief() {
   a.download = "brief.json";
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast("brief.json downloaded");
+  showToast("brief.json 已下载");
 }
 
 function copyBrief() {
   const brief = buildBrief();
   navigator.clipboard.writeText(JSON.stringify(brief, null, 2)).then(
-    () => showToast("Brief JSON copied to clipboard"),
-    () => showToast("Copy failed — select JSON manually")
+    () => showToast("简报 JSON 已复制到剪贴板"),
+    () => showToast("复制失败，请手动选择 JSON")
   );
 }
 
@@ -847,13 +841,13 @@ function copyCommand() {
   const ext = state.delivery === "showcase" ? "html" : "pptx";
   const cmd = `python3 scripts/generate.py brief.json --out output/deck.${ext}`;
   navigator.clipboard.writeText(cmd).then(
-    () => showToast("Command copied"),
-    () => showToast("Copy failed")
+    () => showToast("命令已复制"),
+    () => showToast("复制失败")
   );
 }
 
 // =====================================================================
-// UTILS
+// 工具函数
 // =====================================================================
 function showToast(msg) {
   const t = document.getElementById("toast");
@@ -869,7 +863,7 @@ function escHtml(s) {
 }
 
 // =====================================================================
-// BOOT
+// 启动
 // =====================================================================
 init();
 </script>
