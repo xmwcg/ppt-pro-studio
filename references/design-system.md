@@ -1,6 +1,8 @@
 # Design System — PPT Pro Studio
 
-5 套商用配色，统一排版规则。渲染器 `ppt_studio_generate.py` 按 `style` 字段套用。
+主题市场（Theme Market）：8 套商用主题，统一排版规则。渲染器按 brief 的
+`theme`（或 `style`）字段套用，主题以独立 JSON 存放于 `themes/`，可自由扩展。
+权威来源见 `themes/*.json`（`python3 scripts/theme_market.py list`）。
 
 ## 配色（hex，无 # 前缀）
 
@@ -11,12 +13,18 @@
 | creative_purple | 1B1033 | 2A1B4A | C77DFF | 7B2FBE | F5EEFF | B39DCE | FF8FB1 | 3D2A63 |
 | academic_white | FFFFFF | FAFAFA | 202020 | 006633 | 1A1A1A | 666666 | B00020 | DDDDDD |
 | minimal_gray | FAFAFA | F0F0F0 | 222222 | 666666 | 1A1A1A | 999999 | 007ACC | E0E0E0 |
+| fintech_green | 0B1F17 | 122B20 | 2EA66B | 4FD1A1 | EAF6F0 | 7FA593 | F2B705 | 1E3A2C |
+| sunset_orange | 1A1206 | 2A1D0C | E8843C | F2B705 | FFF3E6 | B58A5E | 5BC0EB | 3A2A14 |
+| mono_ink | 0A0A0A | 161616 | FFFFFF | A0A0A0 | FFFFFF | 7A7A7A | FF4D4D | 2A2A2A |
 
 - **tech_dark**：发布会/科技分享/路演首选，金色主标题+科技蓝副标题。
 - **business_blue**：商业汇报、企业内训，稳重专业。
 - **creative_purple**：创意展示、品牌发布，时尚活力。
 - **academic_white**：论文答辩、学术汇报，简洁规范。
 - **minimal_gray**：通用百搭，留白克制。
+- **fintech_green**：金融/数据/增长主题，绿金搭配，信任感强。
+- **sunset_orange**：暖色调营销/品牌故事，亲和有温度。
+- **mono_ink**：极简黑白＋一点红，高对比、强记忆点。
 
 ## 排版规则（全局统一）
 

@@ -5,7 +5,7 @@ description: >
   幻灯片、商业汇报、路演材料、课程课件，或说"做个关于 X 的 PPT"时触发。工作流强制以
   **提示词增强**为首个步骤，将模糊需求转化为结构化制作简报，再经大纲→设计→渲染→质检→
   导出，产出可编辑、可商用的 .pptx。可独立运行，也可经 ppt-studio-mcp 被任意 MCP 大模型调用。
-version: 1.0.0
+version: 1.1.0
 license: MIT
 metadata:
   openclaw:
@@ -57,7 +57,10 @@ visibility: public
 - **主题 / Topic**：一句话核心命题。
 - **受众 / Audience**：投资人？学员？客户？内部团队？决定措辞深度与例子。
 - **目标 / Goal**：说服、教学、汇报、销售？决定叙事结构。
-- **风格 / Style**：从 `{tech_dark, business_blue, creative_purple, academic_white, minimal_gray}` 选一。
+- **风格 / Style**：从主题市场 `themes/`（`tech_dark, business_blue, creative_purple,
+  academic_white, minimal_gray, fintech_green, sunset_orange, mono_ink`，共 8 套）
+  选一，brief 用 `theme` 或 `style` 字段引用。自定义主题：往 `themes/` 丢一个
+  JSON 即可（`python3 scripts/theme_market.py list` 浏览，`validate` 校验）。
 - **页数 / Length**：建议 8–20 页（商业汇报 10–14 页最佳）。
 - **章节 / Sections**：3–6 个一级模块，每个模块 1–3 页。
 - **约束 / Constraints**：品牌色、禁用词、必须出现的概念、交付格式(.pptx/.pdf/网页)。
@@ -70,14 +73,48 @@ visibility: public
 
 基于 enhanced_brief，产出逐页大纲 `outline.json`，每页标注：
 `{ type, title, subtitle?, items?/columns?/rows?/series? , num? }`。
-版式类型（12 种，与渲染器一一对应）：
-`cover, section, agenda, content, two_column, table, chart, timeline, quote, image, summary, contact`。
+版式类型（13 种，与渲染器一一对应）：
+`cover, section, agenda, content, two_column, table, chart, timeline, quote,
+image, media, summary, contact`。
+其中 `media` 为**图文混排**（图片 + 文字左右排布），`image` 为整页大图。
 
 ### ④ 设计系统
 
 按所选 style 套用 `references/design-system.md` 的配色与排版。统一：
 标题字体 28pt 主色、正文 15pt、卡片表面色、1px 分隔线、页脚+页码。
 中文统一 `Microsoft YaHei`（非 Windows 自动回退默认字体）。
+
+### ④-b 主题市场 / 图文混排 / 演讲者备注（P2 能力）
+
+**主题市场（Theme Market）。** 主题是一组可编辑的设计令牌
+（`bg, surface, primary, secondary, text, muted, accent, line, font`），以
+独立 JSON 存放在 `themes/`，渲染时按需加载并合并内置调色板。用户无需改引擎
+代码即可扩展：拷贝任一 `*.json` 改色即新主题。CLI：
+```bash
+python3 scripts/theme_market.py list                # 浏览 8 套主题
+python3 scripts/theme_market.py show fintech_green  # 查看令牌
+python3 scripts/theme_market.py validate brief.json # 校验 brief 主题存在
+python3 scripts/theme_market.py init                # 重置 themes/*.json
+```
+brief 用 `"theme": "fintech_green"`（或别名 `"style"`）切换；未知主题回退
+`tech_dark`。品牌色仍写入母版 `theme1.xml`，PPT/WPS 面板一处改全局。
+
+**图文混排（media）。** 版式 `media`：图片在一侧、文字块在另一侧
+（`image_position: "left"|"right"`）。文字块支持 `heading` + `items`
+（要点，兼容 `|` 详情）或自由 `text`。图片按原始比例 contain 适配并居中：
+`python-pptx` 用 `add_picture` + PIL 计算比例；主路径把图片以 base64 data-URI
+内嵌进 SVG（`preserveAspectRatio` 适配），零外部文件依赖。图片缺失时显示品牌
+占位框。可选 `caption` 图注。示例：
+```json
+{"type":"media","title":"产品一览","image":"examples/assets/dashboard.png",
+ "image_position":"left","heading":"为什么客户留下来",
+ "items":["实时调用监控 | 异常自动告警","开箱即用看板 | 无需自建 BI"],
+ "caption":"图：运营看板（演示数据）"}
+```
+
+**演讲者备注（notes）。** 任意页加 `"notes": "..."` 即写入演讲者备注栏：
+`python-pptx` 走 `slide.notes_slide`；主路径把 `notes/page_NNN.md` 写入工程，
+由 ppt-master 自动嵌入。备注不进入画面、不影响排版，纯给演讲者看。
 
 ### ⑤ 内容填充
 
@@ -126,7 +163,7 @@ python3 scripts/ppt_studio_generate.py brief.json --out deliverable_fallback.ppt
 **QA 2.0 排版校验（推荐，程序化）**：渲染后跑
 `python3 scripts/qa2.py deliverable.pptx [--json report.json]`，自动审计
 边界越界、占位符残留、正文≥11pt 字号下限、翻页动画、矢量图标数量、母版品牌
-主题一致性，并给出 0–100 评分。零 error 级问题即通过。
+主题一致性、演讲者备注页数、图片数量，并给出 0–100 评分。零 error 级问题即通过。
 
 MCP 用户可调用 `qa_check` 工具做程序化校验（页数、空页、占位符扫描）。
 

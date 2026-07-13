@@ -15,15 +15,17 @@
 |------|------|
 | `SKILL.md` | The orchestration workflow (prompt-enhancement FIRST → outline → design → render → QA → export). For any skill-compatible agent. |
 | `scripts/ppt_master_hifi.py` | **Primary** renderer: brief → high-fidelity SVG → ppt-master `svg_to_pptx` → native `.pptx` + random page transitions. Wraps the highest-starred PPTX skill (hugohe3/ppt-master, 16.6k★, MIT). |
-| `scripts/ppt_studio_generate.py` | **Fallback** deterministic python-pptx renderer. 5 palettes, 12 slide types, native charts, overflow-safe auto-fit. |
+| `scripts/ppt_studio_generate.py` | **Fallback** deterministic python-pptx renderer. Theme-market aware, 13 slide types, native charts, image+text mixed layout, speaker notes, overflow-safe auto-fit. |
+| `scripts/theme_market.py` | **Theme market** CLI + loader: `list` / `show` / `validate` / `init`; themes live as standalone JSON in `themes/`. |
 | `scripts/add_transitions.py` | Injects random per-slide transitions via ppt-master's OOXML transition core. |
-| `scripts/qa2.py` | QA 2.0 layout audit: bounds, placeholders, font floor (≥11pt), transitions, icons, brand theme, score. |
+| `scripts/qa2.py` | QA 2.0 layout audit: bounds, placeholders, font floor (≥11pt), transitions, icons, pictures, speaker-notes count, brand theme, score. |
 | `vendor/ppt-master-scripts/` | Bundled ppt-master converter + transition core (offline, MIT). |
 | `mcp-server/ppt-studio-mcp.js` | Zero-dependency MCP server (stdio). Tools: `generate_ppt`, `qa_check`, `list_styles`. |
 | `references/prompt-refiner-PROMPT.md` | The mandatory first-step prompt-enhancer (MIT, from xie-maker/prompt-refiner-skill). |
 | `references/design-system.md` | Palettes + typography + field mapping. |
 | `references/qa-checklist.md` | Quality gate. |
-| `examples/sample-brief.json` | Example input. |
+| `examples/sample-brief.json` | Example input (14 slides, demonstrates `media` + `notes` + theme). |
+| `themes/` | Theme market: 8 selectable palettes as standalone JSON (add your own). |
 
 ## The pipeline (always serial)
 
@@ -48,6 +50,20 @@ The ppt-master converter is **bundled offline** in `vendor/ppt-master-scripts/` 
 — pure python-pptx, `TEXT_TO_FIT_SHAPE` auto-fit + dynamic line spacing + transitions. Auto-used if the primary path is unavailable.
 
 Universal: connect `ppt-studio-mcp` and call `generate_ppt` (internally primary→fallback).
+
+## P2 capabilities
+
+- **Theme Market** — 8 bundled, editable themes in `themes/` (incl. `fintech_green`,
+  `sunset_orange`, `mono_ink`). Pick via brief `theme`/`style`; add your own JSON
+  with zero engine changes. `python3 scripts/theme_market.py list` to browse.
+- **Image + text mixed layout (`media`)** — picture on either side, text block on
+  the other; aspect-ratio contain-fit, optional caption. Primary path embeds the
+  image as a self-contained base64 data-URI SVG; fallback uses `add_picture`.
+- **Speaker notes (`notes`)** — per-slide presenter notes written to the notes
+  pane (ppt-master `notes/page_NNN.md` / python-pptx `notes_slide`). Purely for the
+  presenter; never shown on the slide.
+- **QA 2.0** counts speaker notes and embedded pictures, and checks brand theming
+  theme-agnostically.
 
 ## Components & licenses (all permissive)
 

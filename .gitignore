@@ -1,7 +1,5 @@
-# Build/test artifacts — keep the two deliverable pptx, exclude scratch files
-output/validate.py
-output/mcp_out.pptx
-output/mcp_test.js
+# Build/test artifacts — generated .pptx / preview / scratch (source lives in examples/)
+output/
 
 # OS / editor noise
 Thumbs.db

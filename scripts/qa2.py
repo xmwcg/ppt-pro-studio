@@ -43,12 +43,14 @@ def audit(path: str) -> dict:
     warnings = []
     icon_shapes = 0
     transition_slides = 0
+    pictures = 0
     min_body = 999
     bounds_hits = 0
 
     for i, slide in enumerate(slides, 1):
         xml = slide._element.xml
         icon_shapes += xml.count("custGeom")
+        pictures += xml.count("<p:pic>")
         if "<p:transition" in xml:
             transition_slides += 1
         # bounds
@@ -93,15 +95,23 @@ def audit(path: str) -> dict:
                         if sz >= 9:
                             min_body = min(min_body, sz)
 
-    # brand theme check
+    # brand theme check (theme-agnostic): the deck's master theme carries a
+    # CUSTOM accent1 colour (i.e. not the default Office theme), proving brand
+    # colours + fonts are editable via the PPT/WPS panels.
     brand = False
+    notes_slides = 0
     try:
+        import re
         z = zipfile.ZipFile(path)
-        th = [n for n in z.namelist()
-              if __import__("re").search(r"theme1?\.xml$", n)]
+        th = [n for n in z.namelist() if re.search(r"theme1?\.xml$", n)]
         if th:
             x = z.read(th[0]).decode("utf-8", "ignore")
-            brand = "D4A060" in x  # tech_dark primary; deck should carry brand
+            m = re.search(r"<a:accent1>\s*<a:srgbClr val=\"([0-9A-Fa-f]{6})\"", x)
+            default_accents = {"5B9BD5", "4472C4", "0070C0", "1F4E79"}
+            if m and m.group(1).upper() not in default_accents:
+                brand = True
+        notes_slides = len([n for n in z.namelist()
+                            if re.match(r"ppt/notesSlides/notesSlide\d+\.xml$", n)])
     except Exception:
         pass
 
@@ -123,7 +133,9 @@ def audit(path: str) -> dict:
         "warnings": warnings,
         "bounds_hits": bounds_hits,
         "icon_shapes": icon_shapes,
+        "pictures": pictures,
         "transitions": transition_slides,
+        "notes_slides": notes_slides,
         "min_body_pt": min_body if min_body != 999 else None,
         "brand_theme": brand,
         "score": score,
@@ -148,8 +160,9 @@ def main():
     print(f"slides={rep['slides']}  score={rep['score']}/100")
     print(f"clean={rep['slides_clean']}  bounds_hits={rep['bounds_hits']}  "
           f"transitions={rep['transitions']}/{rep['slides']}")
-    print(f"icon/vector shapes={rep['icon_shapes']}  "
-          f"min_body={rep['min_body_pt']}pt  brand_theme={rep['brand_theme']}")
+    print(f"icon/vector shapes={rep['icon_shapes']}  pictures={rep['pictures']}  "
+          f"notes_slides={rep['notes_slides']}")
+    print(f"min_body={rep['min_body_pt']}pt  brand_theme={rep['brand_theme']}")
     if rep["errors"]:
         print(f"\nERRORS ({len(rep['errors'])}):")
         for e in rep["errors"]:

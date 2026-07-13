@@ -1,0 +1,12 @@
+{
+  "label": "极简墨 (Mono Ink)",
+  "bg": "0A0A0A",
+  "surface": "161616",
+  "primary": "FFFFFF",
+  "secondary": "A0A0A0",
+  "text": "FFFFFF",
+  "muted": "7A7A7A",
+  "accent": "FF4D4D",
+  "line": "2A2A2A",
+  "font": "Microsoft YaHei"
+}

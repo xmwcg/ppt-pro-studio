@@ -1,0 +1,12 @@
+{
+  "label": "简约灰 (Minimal Gray)",
+  "bg": "FAFAFA",
+  "surface": "F0F0F0",
+  "primary": "222222",
+  "secondary": "666666",
+  "text": "1A1A1A",
+  "muted": "999999",
+  "accent": "007ACC",
+  "line": "E0E0E0",
+  "font": "Microsoft YaHei"
+}

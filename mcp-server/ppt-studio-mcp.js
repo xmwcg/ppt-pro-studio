@@ -72,7 +72,7 @@ const TOOLS = [
       properties: {
         brief: {
           type: 'object',
-          description: 'The PPT brief JSON. Must contain "slides" array; optional "style" (tech_dark|business_blue|creative_purple|academic_white|minimal_gray), "title", "footer", "page_numbers".',
+          description: 'The PPT brief JSON. Must contain "slides" array; optional "theme" or "style" (one of the 8 themes from list_styles), "title", "footer", "page_numbers". Slide types include media (image+text) and any slide may carry "notes" (speaker notes).',
         },
         out: { type: 'string', description: 'Output .pptx path (e.g. "./deck.pptx").' },
       },
@@ -200,6 +200,7 @@ function doQa(args) {
 }
 
 function doStyles() {
+  // Mirrors themes/*.json in the theme market (run `theme_market.py list`).
   return {
     ok: true,
     styles: [
@@ -208,6 +209,9 @@ function doStyles() {
       { id: 'creative_purple', label: '创意紫 (Creative Purple)' },
       { id: 'academic_white', label: '学术白 (Academic White)' },
       { id: 'minimal_gray', label: '简约灰 (Minimal Gray)' },
+      { id: 'fintech_green', label: '金融绿 (Fintech Green)' },
+      { id: 'sunset_orange', label: '暖阳橙 (Sunset Orange)' },
+      { id: 'mono_ink', label: '极简墨 (Mono Ink)' },
     ],
   };
 }

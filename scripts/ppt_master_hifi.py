@@ -22,6 +22,7 @@ overflows the slide. No network, no watermarks. MIT-0.
 from __future__ import annotations
 
 import argparse
+import base64
 import json
 import os
 import shutil
@@ -31,6 +32,11 @@ import tempfile
 from pathlib import Path
 
 from icons import icon_svg, DEFAULT_ICON
+try:
+    from theme_market import load_themes, select_theme
+except ImportError:  # allow running with scripts/ as cwd
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from theme_market import load_themes, select_theme
 
 # ---------------------------------------------------------------------------
 # Design system — must stay in sync with ppt_studio_generate.py
@@ -57,6 +63,9 @@ FONT = "Microsoft YaHei"
 W, H = 1280, 720          # ppt169 canvas (matches ppt-master default)
 SCALE = 96.0              # px per inch
 PT2PX = 96.0 / 72.0       # pt -> px
+
+# Theme market: on-disk themes/*.json merged OVER the built-in PALETTES below.
+THEMES = load_themes(builtin=PALETTES)
 
 
 def X(i: float) -> float:
@@ -517,6 +526,57 @@ class SvgSlide:
                              self.p["muted"], align="center"))
         return out
 
+    def media(self, d):
+        """图文混排 (image + text mixed layout). The image is embedded as a
+        base64 data URI and contain-fitted via preserveAspectRatio, so it is
+        fully self-contained in the SVG and in the final .pptx (no external
+        file dependency). Missing image -> branded placeholder."""
+        out = [self._bg(),
+               self._title_bar(d.get("title", ""), d.get("subtitle"),
+                               stype="media")]
+        img = d.get("image") or d.get("image_path") or ""
+        pos = (d.get("image_position") or "left").lower()
+        img_x, img_y, img_w, img_h = X(0.6), Y(1.8), X(5.7), Y(4.6)
+        txt_x = X(6.7)
+        if pos == "right":
+            img_x, txt_x = X(6.9), X(0.6)
+        if img and os.path.exists(img):
+            ext = os.path.splitext(img)[1].lower().lstrip(".")
+            mime = {"png": "png", "jpg": "jpeg", "jpeg": "jpeg",
+                    "gif": "gif", "webp": "webp"}.get(ext, "png")
+            with open(img, "rb") as fh:
+                b64 = base64.b64encode(fh.read()).decode("ascii")
+            href = f"data:image/{mime};base64,{b64}"
+            out.append(
+                f'<image x="{img_x:.1f}" y="{img_y:.1f}" width="{img_w:.1f}" '
+                f'height="{img_h:.1f}" href="{href}" '
+                f'preserveAspectRatio="xMidYMid meet"/>')
+        else:
+            out.append(rect(img_x, img_y, img_w, img_h, self.p["surface"],
+                            stroke=self.p["line"]))
+            out.append(_text(img_x + img_w / 2, img_y + img_h / 2,
+                             "[ 图片缺失 ]", PX(14), self.p["muted"],
+                             align="center"))
+        if d.get("caption"):
+            c, _ = vtext(img_x + img_w / 2, img_y + img_h + PX(6),
+                         d["caption"], PX(11), self.p["muted"], align="center",
+                         max_w=img_w, max_h=Y(0.4))
+            out.append(c)
+        ty = Y(1.9)
+        if d.get("heading"):
+            h, _ = vtext(txt_x, ty, d["heading"], PX(18), self.p["primary"],
+                         bold=True, max_w=X(6.0), max_h=Y(0.6))
+            out.append(h)
+            ty += Y(0.75)
+        if d.get("text"):
+            t, _ = vtext(txt_x, ty, d["text"], PX(14), self.p["text"],
+                         max_w=X(6.0), max_h=Y(4.8))
+            out.append(t)
+        else:
+            out.append(self._bullets(d.get("items", []), txt_x, ty, X(6.0),
+                                     Y(0.6)))
+        return out
+
     def summary(self, d):
         out = [self._bg(), self._title_bar(d.get("title", "总结"), stype="summary"),
                self._bullets(d.get("points", []), X(0.9), Y(1.7), X(11.5), Y(0.66))]
@@ -548,8 +608,8 @@ class SvgSlide:
     RENDERERS = {
         "cover": cover, "section": section, "agenda": agenda, "content": content,
         "two_column": two_column, "table": table, "chart": chart, "timeline": timeline,
-        "quote": quote, "image": image, "summary": summary, "bullets": bullets,
-        "contact": contact,
+        "quote": quote, "image": image, "media": media, "summary": summary,
+        "bullets": bullets, "contact": contact,
     }
 
     def render(self, slide: dict) -> str:
@@ -585,6 +645,13 @@ def build_project(brief: dict, project_dir: Path, pal: dict, footer: str,
             svg = svg.replace("</svg>", f"  {footer_svg(pal, i, footer, page_numbers)}\n</svg>")
         (project_dir / "svg_output" / f"page_{i:03d}.svg").write_text(
             svg, encoding="utf-8")
+        # Speaker notes (演讲者备注): ppt-master embeds notes/<stem>.md
+        # automatically. Stem must match the SVG page stem (page_NNN).
+        notes = sl.get("notes")
+        if notes:
+            notes_dir = project_dir / "notes"
+            notes_dir.mkdir(parents=True, exist_ok=True)
+            (notes_dir / f"page_{i:03d}.md").write_text(notes, encoding="utf-8")
     spec = f"""# spec_lock
 
 ## pptx_structure
@@ -625,13 +692,19 @@ def run_convert(project_dir: Path, scripts_dir: Path, python_exe: str) -> Path:
         raise FileNotFoundError(f"ppt-master converter not found: {script}")
     env = dict(os.environ)
     env["PYTHONIOENCODING"] = "utf-8"
+    # Capture as bytes and decode safely: the bundled ppt-master may shell out
+    # to an external image optimizer that emits non-UTF8 bytes on its pipe,
+    # which would otherwise crash subprocess.run in text mode. --no-image-
+    # optimize avoids that external subprocess entirely (images are small).
     proc = subprocess.run(
-        [python_exe, str(script), str(project_dir)],
-        capture_output=True, text=True, encoding="utf-8", errors="replace",
+        [python_exe, str(script), str(project_dir), "--no-image-optimize"],
+        capture_output=True,
         cwd=str(scripts_dir), env=env,
     )
+    out = (proc.stdout or b"").decode("utf-8", "replace")
+    err = (proc.stderr or b"").decode("utf-8", "replace")
     if proc.returncode != 0:
-        sys.stderr.write(proc.stdout + "\n" + proc.stderr + "\n")
+        sys.stderr.write(out + "\n" + err + "\n")
         raise RuntimeError(f"svg_to_pptx failed (exit {proc.returncode})")
     exports = list((project_dir / "exports").glob("*.pptx"))
     if not exports:
@@ -678,8 +751,8 @@ def main():
     with open(args.brief, "r", encoding="utf-8") as f:
         brief = json.load(f)
 
-    style = brief.get("style", "tech_dark")
-    pal = PALETTES.get(style, PALETTES["tech_dark"])
+    style = brief.get("theme") or brief.get("style", "tech_dark")
+    pal = select_theme(brief, THEMES)
     footer = brief.get("footer", "")
     page_numbers = brief.get("page_numbers", True)
 
@@ -687,7 +760,7 @@ def main():
 
     tmp = None
     if args.keep_project:
-        project_dir = Path(args.keep_project)
+        project_dir = Path(args.keep_project).resolve()
         project_dir.mkdir(parents=True, exist_ok=True)
     else:
         tmp = tempfile.mkdtemp(prefix="ppt_hifi_")

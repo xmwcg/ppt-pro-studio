@@ -35,6 +35,13 @@ except ImportError:  # allow running with scripts/ as cwd
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from icons import add_icon_to_slide, DEFAULT_ICON
 
+try:
+    from theme_market import load_themes, select_theme
+except ImportError:  # allow running with scripts/ as cwd
+    import os
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    from theme_market import load_themes, select_theme
+
 # ---------------------------------------------------------------------------
 # Design system — 5 commercial palettes (+ the dark-tech reference palette)
 # Every palette: bg, surface, primary, secondary, text, muted, accent, line
@@ -133,6 +140,12 @@ STYLE_LABELS = {
     "minimal_gray": "简约灰 (Minimal Gray)",
 }
 
+# Theme market: on-disk themes/*.json merged OVER the built-in PALETTES above,
+# so users can add custom themes without editing engine code. The brief picks a
+# theme via `theme` (or the `style` alias).
+THEMES = load_themes(builtin=PALETTES)
+STYLE_LABELS = {k: v.get("label", k) for k, v in THEMES.items()}
+
 FONT = "Microsoft YaHei"  # cross-platform: falls back to default on non-Windows
 EMU_IN = 914400
 SLIDE_W = Inches(13.333)
@@ -144,8 +157,8 @@ def _c(hex_str: str) -> RGBColor:
 
 
 class Studio:
-    def __init__(self, palette_name: str):
-        self.p = PALETTES.get(palette_name, PALETTES["tech_dark"])
+    def __init__(self, palette_name: str | None = None):
+        self.p = THEMES.get(palette_name, THEMES["tech_dark"])
         self.prs = Presentation()
         self.prs.slide_width = SLIDE_W
         self.prs.slide_height = SLIDE_H
@@ -606,6 +619,61 @@ class Studio:
                       "[ 图片缺失: %s ]" % path, size=14,
                       color=self.p["muted"], align=PP_ALIGN.CENTER)
 
+    def media(self, s, data):
+        """图文混排 (image + text mixed layout). Image sits left/right, the
+        text block (heading + bullets, or free text) fills the other side.
+        Image is contain-fitted via its natural aspect ratio (PIL best-effort)
+        and centered in its column; missing image -> branded placeholder."""
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="media")
+        img = data.get("image") or data.get("image_path") or ""
+        pos = (data.get("image_position") or "left").lower()
+        img_x, img_y, img_w, img_h = 0.6, 1.8, 5.7, 4.6
+        txt_x = 6.7
+        if pos == "right":
+            img_x, txt_x = 6.9, 0.6
+        if img and os.path.exists(img):
+            try:
+                from PIL import Image
+                with Image.open(img) as im:
+                    iw, ih = im.size
+                box_ar, nat_ar = img_w / img_h, (iw / ih) if ih else 1.0
+                if nat_ar > box_ar:
+                    w, h = img_w, img_w / nat_ar
+                else:
+                    h, w = img_h, img_h * nat_ar
+                left = img_x + (img_w - w) / 2.0
+                top = img_y + (img_h - h) / 2.0
+                s.shapes.add_picture(img, Inches(left), Inches(top),
+                                     Inches(w), Inches(h))
+            except Exception:
+                self._rect(s, img_x, img_y, img_w, img_h, self.p["surface"],
+                           line=self.p["line"])
+                self._txt(s, img_x, img_y + img_h / 2 - 0.3, img_w, 0.6,
+                          "[ 图片缺失 ]", size=14, color=self.p["muted"],
+                          align=PP_ALIGN.CENTER)
+        else:
+            self._rect(s, img_x, img_y, img_w, img_h, self.p["surface"],
+                       line=self.p["line"])
+            self._txt(s, img_x, img_y + img_h / 2 - 0.3, img_w, 0.6,
+                      "[ 图片缺失 ]", size=14, color=self.p["muted"],
+                      align=PP_ALIGN.CENTER)
+        if data.get("caption"):
+            self._txt(s, img_x, img_y + img_h + 0.05, img_w, 0.4,
+                      data["caption"], size=11, color=self.p["muted"],
+                      align=PP_ALIGN.CENTER)
+        ty = 1.9
+        if data.get("heading"):
+            self._txt(s, txt_x, ty, 6.0, 0.6, data["heading"], size=18,
+                      bold=True, color=self.p["primary"])
+            ty += 0.75
+        if data.get("text"):
+            self._txt(s, txt_x, ty, 6.0, (1.9 + 4.6) - ty, data["text"],
+                      size=14, color=self.p["text"])
+        else:
+            self._bullets(s, data.get("items", []), txt_x, ty, 6.0, 0.6)
+
     def summary(self, s, data):
         self._bg(s)
         self._title_bar(s, data.get("title", "总结"), stype="summary")
@@ -636,16 +704,14 @@ class Studio:
         "cover": cover, "section": section, "agenda": agenda,
         "content": content, "two_column": two_column, "table": table,
         "chart": chart, "timeline": timeline, "quote": quote,
-        "image": image, "summary": summary, "bullets": bullets,
+        "image": image, "media": media, "summary": summary, "bullets": bullets,
         "contact": contact,
     }
 
     def build(self, brief: dict, out_path: str, no_transition: bool = False,
               seed=None, duration: float = 0.5):
-        style = brief.get("style", "tech_dark")
-        if style not in PALETTES:
-            style = "tech_dark"
-        self.p = PALETTES[style]
+        self.p = select_theme(brief, THEMES)
+        style = brief.get("theme") or brief.get("style") or "tech_dark"
         slides = brief.get("slides", [])
         total = len(slides)
         for idx, sl in enumerate(slides, 1):
@@ -653,6 +719,13 @@ class Studio:
             renderer = self.RENDERERS.get(stype, self.content)
             s = self._slide()
             renderer(self, s, sl)
+            # speaker notes (演讲者备注) — best effort, never fatal
+            notes = sl.get("notes")
+            if notes:
+                try:
+                    s.notes_slide.notes_text_frame.text = notes
+                except Exception:
+                    pass
             # footer + page numbers on non-cover/section pages
             if stype not in ("cover", "section"):
                 self._footer(s, idx, brief.get("footer", ""),
@@ -704,7 +777,7 @@ def main():
     args = ap.parse_args()
     with open(args.brief, "r", encoding="utf-8") as f:
         brief = json.load(f)
-    studio = Studio(brief.get("style", "tech_dark"))
+    studio = Studio(brief.get("theme") or brief.get("style"))
     out, transitions = studio.build(
         brief, args.out, no_transition=args.no_transition,
         seed=args.seed, duration=args.transition_duration)
@@ -712,7 +785,7 @@ def main():
                       "slides": len(brief.get("slides", [])),
                       "transitions": transitions,
                       "engine": "python-pptx (deterministic fallback)",
-                      "style": brief.get("style", "tech_dark")},
+                      "theme": brief.get("theme") or brief.get("style", "tech_dark")},
                      ensure_ascii=False))
 
 
