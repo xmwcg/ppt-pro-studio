@@ -9,37 +9,52 @@
     --bg: #0D1117; --surface: #151D2E; --primary: #D4A060;
     --secondary: #58A6FF; --text: #FFFFFF; --muted: #8B949E;
     --accent: #3FB950; --line: #30363D; --radius: 10px;
+    --danger: #FF4D4D; --warning: #F2B705; --success: #3FB950;
     --font: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: var(--font); background: var(--bg); color: var(--text);
-    line-height: 1.6; min-height: 100vh; padding: 0;
+    line-height: 1.6; min-height: 100vh;
   }
-  /* ---- header ---- */
+  /* ---- header + step bar ---- */
   header {
     background: linear-gradient(135deg, var(--surface), #1a2438);
-    border-bottom: 2px solid var(--primary); padding: 18px 32px;
-    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 2px solid var(--primary); padding: 14px 32px;
     position: sticky; top: 0; z-index: 100;
   }
+  .header-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   header h1 { font-size: 22px; color: var(--primary); }
   header h1 span { color: var(--muted); font-size: 14px; margin-left: 12px; }
   header .badge {
     background: var(--accent); color: var(--bg); font-size: 12px;
     font-weight: 700; padding: 3px 10px; border-radius: 20px;
   }
+  .step-bar { display: flex; align-items: center; gap: 0; }
+  .step { display: flex; align-items: center; gap: 6px; cursor: pointer; opacity: .5; transition: opacity .2s; }
+  .step.active { opacity: 1; }
+  .step.done { opacity: .8; }
+  .step .step-num {
+    width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--line); color: var(--muted); transition: all .2s;
+  }
+  .step.active .step-num { background: var(--primary); color: var(--bg); }
+  .step.done .step-num { background: var(--accent); color: var(--bg); }
+  .step .step-label { font-size: 12px; color: var(--muted); }
+  .step.active .step-label { color: var(--text); }
+  .step-line { flex: 1; height: 1px; background: var(--line); margin: 0 10px; min-width: 20px; }
   /* ---- layout ---- */
-  .main { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: calc(100vh - 64px); }
-  .left-panel { padding: 24px; overflow-y: auto; max-height: calc(100vh - 64px); }
+  .main { display: grid; grid-template-columns: 1fr 1fr; gap: 0; min-height: calc(100vh - 100px); }
+  .left-panel { padding: 20px 24px; overflow-y: auto; max-height: calc(100vh - 100px); }
   .right-panel {
-    padding: 24px; background: var(--surface); overflow-y: auto;
-    max-height: calc(100vh - 64px); border-left: 1px solid var(--line);
+    padding: 20px 24px; background: var(--surface); overflow-y: auto;
+    max-height: calc(100vh - 100px); border-left: 1px solid var(--line);
   }
   /* ---- section ---- */
-  .section { margin-bottom: 28px; }
+  .section { margin-bottom: 24px; }
   .section h2 {
-    font-size: 15px; color: var(--secondary); margin-bottom: 12px;
+    font-size: 15px; color: var(--secondary); margin-bottom: 10px;
     border-bottom: 1px solid var(--line); padding-bottom: 6px;
     display: flex; align-items: center; gap: 8px;
   }
@@ -48,42 +63,38 @@
     width: 20px; height: 20px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center; font-weight: 700;
   }
+  .section h2 .hint { margin-left: auto; font-size: 11px; color: var(--muted); font-weight: 400; }
   /* ---- template gallery ---- */
   .tmpl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; }
   .tmpl-card {
     background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
-    padding: 14px; cursor: pointer; transition: all .2s;
+    padding: 12px; cursor: pointer; transition: all .2s;
   }
   .tmpl-card:hover { border-color: var(--secondary); transform: translateY(-2px); }
   .tmpl-card.active { border-color: var(--primary); background: #1a2235; }
   .tmpl-card .label { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
   .tmpl-card .desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
-  .tmpl-card .meta { font-size: 11px; color: var(--accent); margin-top: 6px; display: flex; gap: 8px; }
-  .tmpl-card .meta span { background: rgba(63,185,80,.15); padding: 1px 6px; border-radius: 4px; }
+  .tmpl-card .meta { font-size: 11px; margin-top: 6px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .tmpl-card .meta span { background: rgba(88,166,255,.15); color: var(--secondary); padding: 1px 6px; border-radius: 4px; }
+  .tmpl-card .meta span.mode-dark { background: rgba(13,17,23,.3); color: var(--muted); }
+  .tmpl-card .meta span.mode-light { background: rgba(255,255,255,.1); color: var(--muted); }
   /* ---- form ---- */
-  .form-row { display: flex; gap: 12px; margin-bottom: 12px; }
-  .form-field { flex: 1; }
+  .form-row { display: flex; gap: 12px; margin-bottom: 10px; }
+  .form-field { flex: 1; position: relative; }
   .form-field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+  .form-field label .req { color: var(--danger); }
+  .form-field label .tip { font-size: 10px; color: var(--muted); margin-left: 4px; opacity: .7; }
   input, select, textarea {
     width: 100%; background: var(--bg); border: 1px solid var(--line);
     color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 14px;
-    font-family: var(--font);
+    font-family: var(--font); transition: border-color .2s;
   }
   input:focus, select:focus, textarea:focus { outline: none; border-color: var(--secondary); }
-  textarea { resize: vertical; min-height: 60px; }
-  /* ---- theme picker ---- */
-  .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
-  .theme-card {
-    border: 2px solid var(--line); border-radius: var(--radius); cursor: pointer;
-    overflow: hidden; transition: all .2s;
-  }
-  .theme-card:hover { border-color: var(--secondary); }
-  .theme-card.active { border-color: var(--primary); }
-  .theme-card .swatch-row { display: flex; height: 32px; }
-  .theme-card .swatch-row div { flex: 1; }
-  .theme-card .info { padding: 6px 8px; font-size: 12px; }
-  .theme-card .info .name { font-weight: 600; }
-  .theme-card .info .hint { font-size: 10px; color: var(--muted); }
+  input.error, select.error, textarea.error { border-color: var(--danger); }
+  input.warn, select.warn, textarea.warn { border-color: var(--warning); }
+  textarea { resize: vertical; min-height: 50px; }
+  .field-error { font-size: 11px; color: var(--danger); margin-top: 2px; display: none; }
+  .field-error.show { display: block; }
   /* ---- delivery toggle ---- */
   .toggle-group { display: flex; gap: 0; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
   .toggle-btn {
@@ -94,128 +105,251 @@
   .toggle-btn.active { background: var(--primary); color: var(--bg); font-weight: 600; }
   .toggle-btn .icon { font-size: 18px; display: block; margin-bottom: 2px; }
   .toggle-btn .note { font-size: 11px; opacity: .8; }
+  /* ---- theme picker ---- */
+  .theme-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(155px, 1fr)); gap: 8px; }
+  .theme-card {
+    border: 2px solid var(--line); border-radius: var(--radius); cursor: pointer;
+    overflow: hidden; transition: all .2s; position: relative;
+  }
+  .theme-card:hover { border-color: var(--secondary); }
+  .theme-card.active { border-color: var(--primary); }
+  .theme-card .swatch-row { display: flex; height: 28px; }
+  .theme-card .swatch-row div { flex: 1; }
+  .theme-card .info { padding: 5px 8px; font-size: 12px; }
+  .theme-card .info .name { font-weight: 600; display: flex; align-items: center; gap: 4px; }
+  .theme-card .info .name .mode-tag { font-size: 9px; padding: 1px 4px; border-radius: 3px; font-weight: 400; }
+  .theme-card .info .name .mode-dark { background: rgba(13,17,23,.5); color: #8B949E; }
+  .theme-card .info .name .mode-light { background: rgba(255,255,255,.15); color: #8B949E; }
+  .theme-card .info .contrast { font-size: 10px; margin-top: 2px; display: flex; gap: 4px; }
+  .theme-card .info .contrast .grade { font-weight: 700; }
+  .theme-card .custom-tag {
+    position: absolute; top: 2px; right: 2px; font-size: 9px;
+    background: var(--accent); color: var(--bg); padding: 1px 5px; border-radius: 3px;
+  }
+  /* ---- custom theme builder ---- */
+  .builder-toggle {
+    background: transparent; border: 1px dashed var(--secondary); color: var(--secondary);
+    padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 13px;
+    font-family: var(--font); margin-bottom: 10px; width: 100%;
+  }
+  .builder-toggle:hover { background: rgba(88,166,255,.1); }
+  .builder-panel {
+    background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px; display: none;
+  }
+  .builder-panel.open { display: block; }
+  .builder-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 12px; }
+  .builder-field { display: flex; flex-direction: column; gap: 4px; }
+  .builder-field label { font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+  .builder-field .color-row { display: flex; align-items: center; gap: 6px; }
+  .builder-field input[type="color"] {
+    width: 36px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 4px; cursor: pointer; background: none;
+  }
+  .builder-field input[type="text"] { flex: 1; font-size: 12px; padding: 5px 8px; font-family: "Cascadia Code", monospace; }
+  .builder-preview {
+    border-radius: 8px; padding: 16px; margin-bottom: 12px; min-height: 80px;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .builder-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .builder-actions button {
+    padding: 6px 14px; border: none; border-radius: 6px; cursor: pointer;
+    font-size: 12px; font-weight: 600; font-family: var(--font);
+  }
+  .builder-actions .btn-save { background: var(--accent); color: var(--bg); }
+  .builder-actions .btn-export { background: var(--secondary); color: var(--bg); }
+  .builder-actions .btn-reset { background: transparent; border: 1px solid var(--line); color: var(--text); }
+  .contrast-info { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .contrast-info .grade-tag { font-weight: 700; padding: 1px 5px; border-radius: 3px; margin-left: 4px; }
   /* ---- page editor ---- */
   .page-item {
     background: var(--bg); border: 1px solid var(--line); border-radius: 6px;
-    padding: 10px; margin-bottom: 8px; display: flex; gap: 8px; align-items: start;
+    margin-bottom: 6px; transition: all .2s;
   }
-  .page-item .pg-num {
+  .page-item.dragging { opacity: .4; }
+  .page-item.drag-over { border-color: var(--secondary); border-style: dashed; }
+  .page-item-header {
+    display: flex; gap: 8px; align-items: center; padding: 8px 10px; cursor: pointer;
+  }
+  .page-item-header .drag-handle {
+    color: var(--muted); cursor: grab; font-size: 14px; flex-shrink: 0;
+  }
+  .page-item-header .pg-num {
     background: var(--secondary); color: var(--bg); font-size: 11px; font-weight: 700;
     width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
     display: flex; align-items: center; justify-content: center;
   }
-  .page-item select { width: 110px; flex-shrink: 0; padding: 5px 8px; font-size: 12px; }
-  .page-item input { font-size: 13px; padding: 5px 8px; }
-  .page-item .del-btn {
-    background: rgba(255,77,77,.2); color: #FF4D4D; border: none; cursor: pointer;
+  .page-item-header .pg-type-icon { font-size: 16px; flex-shrink: 0; }
+  .page-item-header .pg-title { flex: 1; font-size: 13px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .page-item-header .pg-type-label { font-size: 11px; color: var(--muted); flex-shrink: 0; }
+  .page-item-header .expand-arrow { color: var(--muted); transition: transform .2s; flex-shrink: 0; }
+  .page-item.expanded .expand-arrow { transform: rotate(90deg); }
+  .page-item-body { display: none; padding: 0 10px 10px; }
+  .page-item.expanded .page-item-body { display: block; }
+  .page-item-body .body-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+  .page-item-body select { width: 130px; flex-shrink: 0; padding: 5px 8px; font-size: 12px; }
+  .page-item-body input { font-size: 13px; padding: 5px 8px; }
+  .page-item-body .items-editor { margin-top: 6px; }
+  .page-item-body .items-editor .item-row { display: flex; gap: 6px; margin-bottom: 4px; align-items: center; }
+  .page-item-body .items-editor .item-row input { font-size: 12px; padding: 4px 8px; }
+  .page-item-body .items-editor .add-item-btn {
+    background: transparent; border: 1px dashed var(--line); color: var(--muted);
+    padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; font-family: var(--font);
+  }
+  .page-item-body .items-editor .add-item-btn:hover { border-color: var(--secondary); color: var(--secondary); }
+  .page-item-body .del-btn {
+    background: rgba(255,77,77,.2); color: var(--danger); border: none; cursor: pointer;
     width: 26px; height: 26px; border-radius: 6px; font-size: 16px; flex-shrink: 0;
   }
-  .page-item .del-btn:hover { background: rgba(255,77,77,.4); }
+  .page-item-body .del-btn:hover { background: rgba(255,77,77,.4); }
   .add-page-btn {
     background: transparent; border: 1px dashed var(--line); color: var(--muted);
     padding: 8px; width: 100%; border-radius: 6px; cursor: pointer; font-size: 13px;
     font-family: var(--font);
   }
   .add-page-btn:hover { border-color: var(--secondary); color: var(--secondary); }
+  /* ---- layout picker modal ---- */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,.6); z-index: 200;
+    display: none; align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+    padding: 24px; max-width: 680px; width: 90%; max-height: 80vh; overflow-y: auto;
+  }
+  .modal h3 { font-size: 18px; color: var(--primary); margin-bottom: 16px; }
+  .layout-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; }
+  .layout-card {
+    background: var(--bg); border: 2px solid var(--line); border-radius: var(--radius);
+    padding: 14px; cursor: pointer; transition: all .2s;
+  }
+  .layout-card:hover { border-color: var(--secondary); transform: translateY(-2px); }
+  .layout-card .layout-icon { font-size: 28px; margin-bottom: 8px; }
+  .layout-card .layout-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .layout-card .layout-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+  .modal-close {
+    position: absolute; top: 12px; right: 16px; background: none; border: none;
+    color: var(--muted); font-size: 22px; cursor: pointer;
+  }
   /* ---- preview ---- */
   .preview-slide {
-    border-radius: var(--radius); overflow: hidden; margin-bottom: 12px;
+    border-radius: var(--radius); overflow: hidden; margin-bottom: 10px;
     box-shadow: 0 4px 20px rgba(0,0,0,.4); aspect-ratio: 16/9; position: relative;
   }
-  .preview-slide .slide-content { padding: 24px; height: 100%; display: flex; flex-direction: column; }
+  .preview-slide .slide-content { padding: 20px; height: 100%; display: flex; flex-direction: column; }
   .preview-nav { display: flex; gap: 8px; align-items: center; justify-content: center; margin-bottom: 16px; }
   .preview-nav button {
     background: var(--bg); border: 1px solid var(--line); color: var(--text);
     width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 14px;
   }
+  .preview-nav button:hover { border-color: var(--secondary); }
   .preview-nav .pg-info { font-size: 13px; color: var(--muted); min-width: 60px; text-align: center; }
+  .preview-nav .kb-hint { font-size: 10px; color: var(--muted); margin-left: 8px; }
   /* ---- export ---- */
-  .export-panel { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+  .export-panel { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
   .export-btn {
-    display: inline-flex; align-items: center; gap: 6px; padding: 10px 20px;
-    border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;
-    font-family: var(--font); margin-right: 8px; margin-bottom: 8px; transition: all .2s;
+    display: inline-flex; align-items: center; gap: 6px; padding: 9px 18px;
+    border: none; border-radius: 8px; cursor: pointer; font-size: 13px; font-weight: 600;
+    font-family: var(--font); margin-right: 6px; margin-bottom: 6px; transition: all .2s;
   }
   .btn-primary { background: var(--accent); color: var(--bg); }
   .btn-secondary { background: var(--secondary); color: var(--bg); }
   .btn-outline { background: transparent; border: 1px solid var(--line); color: var(--text); }
   .export-btn:hover { opacity: .85; }
+  .export-btn:disabled { opacity: .4; cursor: not-allowed; }
   .cmd-box {
     background: #050a10; border: 1px solid var(--line); border-radius: 6px;
-    padding: 12px; font-family: "Cascadia Code", "Consolas", monospace; font-size: 13px;
-    color: var(--accent); margin-top: 12px; overflow-x: auto; white-space: pre;
+    padding: 10px; font-family: "Cascadia Code", "Consolas", monospace; font-size: 12px;
+    color: var(--accent); margin-top: 10px; overflow-x: auto; white-space: pre;
   }
   /* ---- toast ---- */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
   .toast {
-    position: fixed; bottom: 24px; right: 24px; background: var(--accent);
-    color: var(--bg); padding: 12px 24px; border-radius: 8px; font-weight: 600;
-    font-size: 14px; z-index: 999; opacity: 0; transition: opacity .3s;
-    box-shadow: 0 4px 20px rgba(0,0,0,.4);
+    padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 13px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.4); opacity: 0; transform: translateX(40px);
+    transition: all .3s;
   }
-  .toast.show { opacity: 1; }
+  .toast.show { opacity: 1; transform: translateX(0); }
+  .toast.success { background: var(--success); color: var(--bg); }
+  .toast.error { background: var(--danger); color: #fff; }
+  .toast.info { background: var(--secondary); color: var(--bg); }
+  .toast.warning { background: var(--warning); color: var(--bg); }
+  /* ---- empty state ---- */
+  .empty-state { text-align: center; padding: 20px; color: var(--muted); font-size: 13px; }
   /* ---- responsive ---- */
   @media (max-width: 900px) {
     .main { grid-template-columns: 1fr; }
     .left-panel, .right-panel { max-height: none; }
+    .builder-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>PPT Pro Studio <span>控制台 — 简报编辑 + 实时预览</span></h1>
-  <span class="badge">v1.2.0</span>
+  <div class="header-row">
+    <h1>PPT Pro Studio <span>控制台 — 简报编辑 + 实时预览</span></h1>
+    <span class="badge">v1.3.0</span>
+  </div>
+  <div class="step-bar" id="stepBar">
+    <div class="step active" data-step="1" onclick="goToStep(1)"><span class="step-num">1</span><span class="step-label">选模板</span></div>
+    <div class="step-line"></div>
+    <div class="step" data-step="2" onclick="goToStep(2)"><span class="step-num">2</span><span class="step-label">填信息</span></div>
+    <div class="step-line"></div>
+    <div class="step" data-step="3" onclick="goToStep(3)"><span class="step-num">3</span><span class="step-label">选主题</span></div>
+    <div class="step-line"></div>
+    <div class="step" data-step="4" onclick="goToStep(4)"><span class="step-num">4</span><span class="step-label">调大纲</span></div>
+    <div class="step-line"></div>
+    <div class="step" data-step="5" onclick="goToStep(5)"><span class="step-num">5</span><span class="step-label">导出</span></div>
+  </div>
 </header>
 
 <div class="main">
-  <!-- ===================== 左侧面板（表单） ===================== -->
+  <!-- ===================== 左侧面板 ===================== -->
   <div class="left-panel">
 
     <!-- 1. 模板市场 -->
-    <div class="section">
-      <h2><span class="num">1</span>模板市场</h2>
+    <div class="section" id="sec-template">
+      <h2><span class="num">1</span>模板市场 <span class="hint">点击模板自动填充</span></h2>
       <div class="tmpl-grid" id="tmplGrid"></div>
     </div>
 
     <!-- 2. 交付路径 -->
-    <div class="section">
+    <div class="section" id="sec-delivery">
       <h2><span class="num">2</span>交付路径</h2>
       <div class="toggle-group">
         <button class="toggle-btn active" data-delivery="editable" onclick="setDelivery('editable')">
-          <span class="icon">&#9998;</span>
-          可编辑 PPTX
-          <span class="note">核心引擎，原生可编辑</span>
+          <span class="icon">&#9998;</span>可编辑 PPTX<span class="note">核心引擎，原生可编辑</span>
         </button>
         <button class="toggle-btn" data-delivery="showcase" onclick="setDelivery('showcase')">
-          <span class="icon">&#127916;</span>
-          演示天花板 HTML
-          <span class="note">Marp 视觉震撼</span>
+          <span class="icon">&#127916;</span>演示天花板 HTML<span class="note">Marp 视觉震撼</span>
         </button>
       </div>
     </div>
 
     <!-- 3. 简报信息 -->
-    <div class="section">
-      <h2><span class="num">3</span>简报信息</h2>
+    <div class="section" id="sec-info">
+      <h2><span class="num">3</span>简报信息 <span class="hint">* 为必填项</span></h2>
       <div class="form-row">
         <div class="form-field">
-          <label>主题 *</label>
-          <input type="text" id="f_topic" placeholder="如：AI Agent 平台 2026 路线图" oninput="updatePreview()">
+          <label>主题 <span class="req">*</span><span class="tip">演示文稿的核心标题</span></label>
+          <input type="text" id="f_topic" placeholder="如：AI Agent 平台 2026 路线图" oninput="onFormInput('f_topic')">
+          <div class="field-error" id="err_topic">请填写主题</div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>受众</label>
+          <label>受众<span class="tip">面向谁演讲</span></label>
           <input type="text" id="f_audience" placeholder="如：投资人 / 学员 / 客户 / 管理层" oninput="updatePreview()">
         </div>
         <div class="form-field">
-          <label>目标</label>
+          <label>目标<span class="tip">期望效果</span></label>
           <input type="text" id="f_goal" placeholder="如：说服 / 教学 / 汇报 / 销售" oninput="updatePreview()">
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>叙事结构</label>
+          <label>叙事结构<span class="tip">决定页面骨架</span></label>
           <select id="f_narrative" onchange="onNarrativeChange()">
             <option value="persuade">说服型 — 痛点 → 方案 → 证明 → 行动号召</option>
             <option value="inform">通知型 — 背景 → 数据 → 分析 → 结论</option>
@@ -226,101 +360,162 @@
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>页数</label>
-          <input type="number" id="f_length" value="12" min="4" max="30" oninput="updatePreview()">
+          <label>页数<span class="tip">4-30 页</span></label>
+          <input type="number" id="f_length" value="12" min="4" max="30" oninput="onFormInput('f_length')">
+          <div class="field-error" id="err_length">页数应在 4-30 之间</div>
         </div>
         <div class="form-field">
-          <label>章节数</label>
+          <label>章节数<span class="tip">2-10</span></label>
           <input type="number" id="f_sections" value="4" min="2" max="10" oninput="updatePreview()">
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>约束条件</label>
+          <label>约束条件<span class="tip">如：不要动画、需要备注</span></label>
           <textarea id="f_constraints" placeholder="如：不要动画、必须 16:9、需要演讲者备注" oninput="updatePreview()"></textarea>
         </div>
       </div>
       <div class="form-row">
         <div class="form-field">
-          <label>验收标准</label>
+          <label>验收标准<span class="tip">交付检查项</span></label>
           <textarea id="f_acceptance" placeholder="如：可编辑 / 无水印 / 中文正常" oninput="updatePreview()"></textarea>
         </div>
       </div>
     </div>
 
-    <!-- 4. 主题市场 -->
-    <div class="section">
-      <h2><span class="num">4</span>主题市场</h2>
+    <!-- 4. 主题市场 + 自定义 -->
+    <div class="section" id="sec-theme">
+      <h2><span class="num">4</span>主题市场 <span class="hint">含 WCAG 对比度检测</span></h2>
       <div class="theme-grid" id="themeGrid"></div>
+      <button class="builder-toggle" id="builderToggle" onclick="toggleBuilder()">
+        + 自定义主题
+      </button>
+      <div class="builder-panel" id="builderPanel">
+        <div class="contrast-info" id="builderContrast"></div>
+        <div class="builder-preview" id="builderPreview"></div>
+        <div class="builder-grid">
+          <div class="builder-field">
+            <label>背景 bg</label>
+            <div class="color-row"><input type="color" id="ct_bg" oninput="onBuilderColor('bg')"><input type="text" id="ct_bg_hex" oninput="onBuilderHex('bg')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>面板 surface</label>
+            <div class="color-row"><input type="color" id="ct_surface" oninput="onBuilderColor('surface')"><input type="text" id="ct_surface_hex" oninput="onBuilderHex('surface')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>主色 primary</label>
+            <div class="color-row"><input type="color" id="ct_primary" oninput="onBuilderColor('primary')"><input type="text" id="ct_primary_hex" oninput="onBuilderHex('primary')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>辅色 secondary</label>
+            <div class="color-row"><input type="color" id="ct_secondary" oninput="onBuilderColor('secondary')"><input type="text" id="ct_secondary_hex" oninput="onBuilderHex('secondary')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>文字 text</label>
+            <div class="color-row"><input type="color" id="ct_text" oninput="onBuilderColor('text')"><input type="text" id="ct_text_hex" oninput="onBuilderHex('text')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>弱化 muted</label>
+            <div class="color-row"><input type="color" id="ct_muted" oninput="onBuilderColor('muted')"><input type="text" id="ct_muted_hex" oninput="onBuilderHex('muted')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>强调 accent</label>
+            <div class="color-row"><input type="color" id="ct_accent" oninput="onBuilderColor('accent')"><input type="text" id="ct_accent_hex" oninput="onBuilderHex('accent')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>线条 line</label>
+            <div class="color-row"><input type="color" id="ct_line" oninput="onBuilderColor('line')"><input type="text" id="ct_line_hex" oninput="onBuilderHex('line')" maxlength="6"></div>
+          </div>
+          <div class="builder-field">
+            <label>字体 font</label>
+            <input type="text" id="ct_font" value="Microsoft YaHei" oninput="updateBuilderPreview()">
+          </div>
+        </div>
+        <div class="builder-actions">
+          <button class="btn-save" onclick="saveCustomTheme()">保存主题</button>
+          <button class="btn-export" onclick="exportCustomTheme()">导出 JSON</button>
+          <button class="btn-reset" onclick="resetBuilder()">重置</button>
+        </div>
+      </div>
     </div>
 
     <!-- 5. 页面大纲 -->
-    <div class="section">
-      <h2><span class="num">5</span>页面大纲</h2>
+    <div class="section" id="sec-pages">
+      <h2><span class="num">5</span>页面大纲 <span class="hint">拖拽排序 · 点击展开编辑</span></h2>
       <div id="pageList"></div>
-      <button class="add-page-btn" onclick="addPage()">+ 添加页面</button>
+      <button class="add-page-btn" onclick="openLayoutPicker()">+ 添加页面</button>
     </div>
 
   </div><!-- /left-panel -->
 
-  <!-- ===================== 右侧面板（预览 + 导出） ===================== -->
+  <!-- ===================== 右侧面板 ===================== -->
   <div class="right-panel">
 
-    <!-- 实时预览 -->
     <div class="section">
-      <h2>实时预览</h2>
+      <h2>实时预览 <span class="hint">← → 键翻页</span></h2>
       <div class="preview-slide" id="previewSlide">
         <div class="slide-content" id="previewContent"></div>
       </div>
       <div class="preview-nav">
-        <button onclick="prevPreviewPage()">&#9664;</button>
+        <button onclick="prevPreviewPage()" title="上一页">&#9664;</button>
         <span class="pg-info" id="pgInfo">1 / 1</span>
-        <button onclick="nextPreviewPage()">&#9654;</button>
+        <button onclick="nextPreviewPage()" title="下一页">&#9654;</button>
+        <span class="kb-hint">Ctrl+D 下载</span>
       </div>
     </div>
 
-    <!-- 导出 -->
     <div class="section">
       <h2>导出与生成</h2>
       <div class="export-panel">
-        <button class="export-btn btn-primary" onclick="downloadBrief()">&#11015; 下载 brief.json</button>
+        <button class="export-btn btn-primary" id="btnDownload" onclick="downloadBrief()">&#11015; 下载 brief.json</button>
         <button class="export-btn btn-secondary" onclick="copyBrief()">&#128203; 复制 JSON</button>
         <button class="export-btn btn-outline" onclick="copyCommand()">&#128203; 复制命令</button>
-        <div style="margin-top: 12px; font-size: 13px; color: var(--muted);">运行以下命令生成 PPT：</div>
+        <div style="margin-top: 10px; font-size: 12px; color: var(--muted);">运行以下命令生成 PPT：</div>
         <div class="cmd-box" id="cmdBox"></div>
       </div>
     </div>
 
-    <!-- Brief JSON 只读视图 -->
     <div class="section">
       <h2>简报 JSON</h2>
-      <div class="cmd-box" id="jsonView" style="max-height: 300px; overflow-y: auto;"></div>
+      <div class="cmd-box" id="jsonView" style="max-height: 260px; overflow-y: auto;"></div>
     </div>
 
   </div><!-- /right-panel -->
 </div><!-- /main -->
 
-<div class="toast" id="toast"></div>
+<!-- Layout Picker Modal -->
+<div class="modal-overlay" id="layoutModal">
+  <div class="modal" style="position: relative;">
+    <button class="modal-close" onclick="closeLayoutPicker()">&times;</button>
+    <h3>选择页面布局</h3>
+    <div class="layout-grid" id="layoutGrid"></div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
 // =====================================================================
-// 数据：主题与模板（与 theme_market.py / template_market.py 同步）
+// 主题数据（与 theme_market.py 同步，新增 mode 字段）
 // =====================================================================
 const THEMES = {
-  tech_dark: { label:"深色科技风", bg:"0D1117", surface:"151D2E", primary:"D4A060", secondary:"58A6FF", text:"FFFFFF", muted:"8B949E", accent:"3FB950", line:"30363D" },
-  business_blue: { label:"商务蓝", bg:"FFFFFF", surface:"F2F6FC", primary:"1F4E79", secondary:"2E75B6", text:"1A1A1A", muted:"5A5A5A", accent:"C55A11", line:"D6E0F0" },
-  creative_purple: { label:"创意紫", bg:"1B1033", surface:"2A1B4A", primary:"C77DFF", secondary:"7B2FBE", text:"F5EEFF", muted:"B39DCE", accent:"FF8FB1", line:"3D2A63" },
-  academic_white: { label:"学术白", bg:"FFFFFF", surface:"FAFAFA", primary:"202020", secondary:"006633", text:"1A1A1A", muted:"666666", accent:"B00020", line:"DDDDDD" },
-  minimal_gray: { label:"简约灰", bg:"FAFAFA", surface:"F0F0F0", primary:"222222", secondary:"666666", text:"1A1A1A", muted:"999999", accent:"007ACC", line:"E0E0E0" },
-  fintech_green: { label:"金融绿", bg:"0B1F17", surface:"122B20", primary:"2EA66B", secondary:"4FD1A1", text:"EAF6F0", muted:"7FA593", accent:"F2B705", line:"1E3A2C" },
-  sunset_orange: { label:"暖阳橙", bg:"1A1206", surface:"2A1D0C", primary:"E8843C", secondary:"F2B705", text:"FFF3E6", muted:"B58A5E", accent:"5BC0EB", line:"3A2A14" },
-  mono_ink: { label:"极简墨", bg:"0A0A0A", surface:"161616", primary:"FFFFFF", secondary:"A0A0A0", text:"FFFFFF", muted:"7A7A7A", accent:"FF4D4D", line:"2A2A2A" },
-  guochao_red: { label:"国潮红", bg:"1A0808", surface:"2A1010", primary:"C8102E", secondary:"2A9D8F", text:"FBF3E8", muted:"B8897A", accent:"E8B04B", line:"3D1A1A" },
-  medical_blue: { label:"医疗蓝", bg:"F4F9FC", surface:"E3F0F8", primary:"0B6E9E", secondary:"16A2C7", text:"1A2B36", muted:"5B7C8D", accent:"2EA66B", line:"C9E2F0" },
-  ecommerce_orange: { label:"电商橙", bg:"FFF7F0", surface:"FFE9D6", primary:"FF6A00", secondary:"FF3D77", text:"2B1A12", muted:"9A7B68", accent:"FFC400", line:"FFD9BE" },
-  gov_red: { label:"党政红", bg:"FFFFFF", surface:"FBEAEC", primary:"C8102E", secondary:"9E1B32", text:"1A1A1A", muted:"6B6B6B", accent:"D4AF37", line:"E6C9CE" },
+  tech_dark: { label:"深色科技风", mode:"dark", bg:"0D1117", surface:"151D2E", primary:"D4A060", secondary:"58A6FF", text:"FFFFFF", muted:"8B949E", accent:"3FB950", line:"30363D" },
+  business_blue: { label:"商务蓝", mode:"light", bg:"FFFFFF", surface:"F2F6FC", primary:"1F4E79", secondary:"2E75B6", text:"1A1A1A", muted:"5A5A5A", accent:"C55A11", line:"D6E0F0" },
+  creative_purple: { label:"创意紫", mode:"dark", bg:"1B1033", surface:"2A1B4A", primary:"C77DFF", secondary:"7B2FBE", text:"F5EEFF", muted:"B39DCE", accent:"FF8FB1", line:"3D2A63" },
+  academic_white: { label:"学术白", mode:"light", bg:"FFFFFF", surface:"FAFAFA", primary:"202020", secondary:"006633", text:"1A1A1A", muted:"666666", accent:"B00020", line:"DDDDDD" },
+  minimal_gray: { label:"简约灰", mode:"light", bg:"FAFAFA", surface:"F0F0F0", primary:"222222", secondary:"666666", text:"1A1A1A", muted:"999999", accent:"007ACC", line:"E0E0E0" },
+  fintech_green: { label:"金融绿", mode:"dark", bg:"0B1F17", surface:"122B20", primary:"2EA66B", secondary:"4FD1A1", text:"EAF6F0", muted:"7FA593", accent:"F2B705", line:"1E3A2C" },
+  sunset_orange: { label:"暖阳橙", mode:"dark", bg:"1A1206", surface:"2A1D0C", primary:"E8843C", secondary:"F2B705", text:"FFF3E6", muted:"B58A5E", accent:"5BC0EB", line:"3A2A14" },
+  mono_ink: { label:"极简墨", mode:"dark", bg:"0A0A0A", surface:"161616", primary:"FFFFFF", secondary:"A0A0A0", text:"FFFFFF", muted:"7A7A7A", accent:"FF4D4D", line:"2A2A2A" },
+  guochao_red: { label:"国潮红", mode:"dark", bg:"1A0808", surface:"2A1010", primary:"C8102E", secondary:"2A9D8F", text:"FBF3E8", muted:"B8897A", accent:"E8B04B", line:"3D1A1A" },
+  medical_blue: { label:"医疗蓝", mode:"light", bg:"F4F9FC", surface:"E3F0F8", primary:"0B6E9E", secondary:"16A2C7", text:"1A2B36", muted:"5B7C8D", accent:"2EA66B", line:"C9E2F0" },
+  ecommerce_orange: { label:"电商橙", mode:"light", bg:"FFF7F0", surface:"FFE9D6", primary:"FF6A00", secondary:"FF3D77", text:"2B1A12", muted:"9A7B68", accent:"FFC400", line:"FFD9BE" },
+  gov_red: { label:"党政红", mode:"light", bg:"FFFFFF", surface:"FBEAEC", primary:"C8102E", secondary:"9E1B32", text:"1A1A1A", muted:"6B6B6B", accent:"D4AF37", line:"E6C9CE" },
 };
 
+// =====================================================================
+// 模板数据（与 template_market.py 同步）
+// =====================================================================
 const TEMPLATES = {
   startup_pitch: { label:"融资路演", desc:"投资人路演：痛点 → 方案 → 证明 → ROI → 行动号召", theme:"tech_dark", narrative:"persuade", delivery:"editable", pages:[
     {type:"cover",title:"公司名 + 一句话价值主张"},
@@ -404,6 +599,88 @@ const TEMPLATES = {
     {type:"two_column",title:"风险与机会",items:["风险","机会"]},
     {type:"summary",title:"投资建议"},
   ]},
+  product_spec: { label:"产品规格", desc:"产品详情：规格参数 → 功能清单 → 数据看板 → 方案对比", theme:"tech_dark", narrative:"inform", delivery:"editable", pages:[
+    {type:"cover",title:"产品名 + 版本号"},
+    {type:"detail_page",title:"产品规格",items:["产品名称：PPT Pro Studio","版本：v1.3.0","授权协议：MIT","适用平台：Windows / macOS / Linux"]},
+    {type:"list_page",title:"核心功能",items:["双引擎渲染：SVG 高保真 + python-pptx 确定性回退","模板市场：13+ 行业模板一键应用","主题系统：12 套主题 + 自定义配色 + WCAG 对比度检测","QA 2.1：程序化排版审计，100 分才交付"]},
+    {type:"dashboard",title:"性能指标",items:["渲染速度：2.3s","QA 评分：100/100","页面类型：18 种","主题数：12+"]},
+    {type:"comparison",title:"方案对比",items:["方案 A：低成本、周期长","方案 B：均衡型、推荐","方案 C：高投入、快速上线"]},
+    {type:"summary",title:"总结与推荐"},
+  ]},
+  data_report: { label:"数据报告", desc:"数据驱动：概览仪表盘 → 统计指标 → 详情 → 对比 → 结论", theme:"fintech_green", narrative:"inform", delivery:"editable", pages:[
+    {type:"cover",title:"季度数据报告"},
+    {type:"agenda",title:"报告议程"},
+    {type:"dashboard",title:"运营概览",items:["月活用户：12,345","营收：¥56,700","留存率：85%","NPS：72"]},
+    {type:"stats",title:"核心增长指标",items:["1.2M 总用户","3x 年增长","98% 满意度","¥2.3M ARR"]},
+    {type:"detail_page",title:"关键指标详情",items:["统计周期：2025 Q4","数据源：内部分析平台","采样方式：全量","置信度：95%"]},
+    {type:"chart",title:"趋势分析"},
+    {type:"comparison",title:"同比对比",items:["2024 Q4：基线","2025 Q4：+34%"]},
+    {type:"summary",title:"结论与建议"},
+  ]},
+  project_plan: { label:"项目计划", desc:"项目启动：目标 → 里程碑 → 资源 → 预算 → 表单", theme:"business_blue", narrative:"inform", delivery:"editable", pages:[
+    {type:"cover",title:"项目名 + 启动时间"},
+    {type:"section",title:"01 项目目标"},
+    {type:"list_page",title:"关键里程碑",items:["M1：需求确认（W1-W2）","M2：原型设计（W3-W4）","M3：开发实施（W5-W8）","M4：测试验收（W9-W10）"]},
+    {type:"detail_page",title:"资源分配",items:["项目经理：1 人","前端开发：2 人","后端开发：2 人","测试：1 人"]},
+    {type:"form_page",title:"信息登记",items:["项目名称：","负责人：","启动日期：","预计完成："]},
+    {type:"dashboard",title:"预算概览",items:["总预算：¥120,000","已用：¥45,000","剩余：¥75,000","使用率：37.5%"]},
+    {type:"summary",title:"下一步行动"},
+  ]},
+};
+
+// =====================================================================
+// 页面布局类型（原有 12 + 新增 6 = 18 种）
+// =====================================================================
+const PAGE_TYPES = [
+  "cover","section","content","two_column","media","chart",
+  "table","timeline","quote","agenda","summary","contact",
+  // 新增布局类型
+  "list_page","detail_page","form_page","dashboard","comparison","stats"
+];
+
+const PAGE_TYPE_LABELS = {
+  cover:"封面", section:"章节", content:"内容", two_column:"双栏",
+  media:"图文", chart:"图表", table:"表格", timeline:"时间线",
+  quote:"金句", agenda:"议程", summary:"总结", contact:"联系方式",
+  // 新增
+  list_page:"列表页", detail_page:"详情页", form_page:"表单页",
+  dashboard:"仪表盘", comparison:"对比页", stats:"数据统计",
+};
+
+const PAGE_TYPE_ICONS = {
+  cover:"🎬", section:"📑", content:"📝", two_column:"⬜",
+  media:"🖼", chart:"📊", table:"🔢", timeline:"📅",
+  quote:"💬", agenda:"📋", summary:"✅", contact:"📞",
+  list_page:"☰", detail_page:"📋", form_page:"✏",
+  dashboard:"📈", comparison:"⚖", stats:"🎯",
+};
+
+// 布局模板（用于布局选择器弹窗）
+const LAYOUT_TEMPLATES = {
+  list_page: {
+    label:"列表页", icon:"☰", desc:"结构化列表，适合功能清单、检查项、步骤说明",
+    defaultTitle:"功能清单", defaultItems:["功能一：核心能力描述","功能二：差异化优势","功能三：用户价值","功能四：技术亮点"],
+  },
+  detail_page: {
+    label:"详情页", icon:"📋", desc:"键值对详情，适合产品规格、人物介绍、项目档案",
+    defaultTitle:"产品详情", defaultItems:["产品名称：PPT Pro Studio","版本：v1.3.0","授权：MIT","适用：Windows / macOS / Linux"],
+  },
+  form_page: {
+    label:"表单页", icon:"✏", desc:"表单式布局，适合流程说明、填写引导、问卷调查",
+    defaultTitle:"信息登记", defaultItems:["姓名：","部门：","日期：","备注："],
+  },
+  dashboard: {
+    label:"仪表盘", icon:"📈", desc:"多数据卡片，适合 KPI 概览、数据监控、运营看板",
+    defaultTitle:"运营看板", defaultItems:["用户总数：12,345","月活：8,901","留存率：85%","营收：¥56,700"],
+  },
+  comparison: {
+    label:"对比页", icon:"⚖", desc:"多方案对比，适合方案选择、竞品分析、优劣对比",
+    defaultTitle:"方案对比", defaultItems:["方案 A：低成本、周期长","方案 B：均衡型","方案 C：高投入、快速上线"],
+  },
+  stats: {
+    label:"数据统计", icon:"🎯", desc:"大数字 KPI，适合核心指标、增长数据、业绩展示",
+    defaultTitle:"核心指标", defaultItems:["1.2M 用户","98% 满意度","3x 年增长","¥2.3M 营收"],
+  },
 };
 
 const NARRATIVE_SKELETONS = {
@@ -445,12 +722,6 @@ const NARRATIVE_SKELETONS = {
   ],
 };
 
-const PAGE_TYPES = ["cover","section","content","two_column","media","chart","table","timeline","quote","agenda","summary","contact"];
-const PAGE_TYPE_LABELS = {
-  cover:"封面", section:"章节", content:"内容", two_column:"双栏",
-  media:"图文", chart:"图表", table:"表格", timeline:"时间线",
-  quote:"金句", agenda:"议程", summary:"总结", contact:"联系方式",
-};
 const NARRATIVE_LABELS = { persuade:"说服型", inform:"通知型", teach:"教学型", inspire:"激励型" };
 const DELIVERY_LABELS = { editable:"可编辑", showcase:"演示天花板" };
 
@@ -464,7 +735,38 @@ let state = {
   narrative: "persuade",
   pages: [],
   previewPage: 0,
+  currentStep: 1,
+  customThemes: JSON.parse(localStorage.getItem("ppt_custom_themes") || "{}"),
+  expandedPage: -1,
 };
+
+// =====================================================================
+// WCAG 对比度计算
+// =====================================================================
+function hexToRgb(hex) {
+  hex = hex.replace("#", "");
+  return { r: parseInt(hex.substr(0,2),16), g: parseInt(hex.substr(2,2),16), b: parseInt(hex.substr(4,2),16) };
+}
+function relLuminance(rgb) {
+  const {r,g,b} = rgb;
+  const rs=r/255, gs=g/255, bs=b/255;
+  const R = rs<=0.03928 ? rs/12.92 : Math.pow((rs+0.055)/1.055, 2.4);
+  const G = gs<=0.03928 ? gs/12.92 : Math.pow((gs+0.055)/1.055, 2.4);
+  const B = bs<=0.03928 ? bs/12.92 : Math.pow((bs+0.055)/1.055, 2.4);
+  return 0.2126*R + 0.7152*G + 0.0722*B;
+}
+function contrastRatio(hex1, hex2) {
+  const L1 = relLuminance(hexToRgb(hex1));
+  const L2 = relLuminance(hexToRgb(hex2));
+  return ((Math.max(L1,L2)+0.05) / (Math.min(L1,L2)+0.05)).toFixed(1);
+}
+function contrastGrade(ratio) {
+  ratio = parseFloat(ratio);
+  if (ratio >= 7) return { label:"AAA", color:"#3FB950" };
+  if (ratio >= 4.5) return { label:"AA", color:"#58A6FF" };
+  if (ratio >= 3) return { label:"AA Large", color:"#F2B705" };
+  return { label:"不达标", color:"#FF4D4D" };
+}
 
 // =====================================================================
 // 初始化
@@ -472,8 +774,40 @@ let state = {
 function init() {
   renderTemplateGrid();
   renderThemeGrid();
+  renderLayoutGrid();
   applyTemplate("startup_pitch");
   updatePreview();
+  updateStepBar();
+}
+
+// =====================================================================
+// 步骤引导条
+// =====================================================================
+function updateStepBar() {
+  const steps = document.querySelectorAll(".step");
+  steps.forEach((s, i) => {
+    s.classList.remove("active", "done");
+    if (i + 1 < state.currentStep) s.classList.add("done");
+    else if (i + 1 === state.currentStep) s.classList.add("active");
+  });
+}
+
+function goToStep(step) {
+  state.currentStep = step;
+  updateStepBar();
+  const sections = ["sec-template","sec-info","sec-theme","sec-pages","sec-info"];
+  const targets = ["sec-template","sec-delivery","sec-info","sec-theme","sec-pages"];
+  // scroll to the target section
+  const map = { 1:"sec-template", 2:"sec-info", 3:"sec-theme", 4:"sec-pages", 5:"sec-pages" };
+  const el = document.getElementById(map[step]);
+  if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
+}
+
+function advanceStep(step) {
+  if (state.currentStep <= step) {
+    state.currentStep = step + 1;
+    updateStepBar();
+  }
 }
 
 // =====================================================================
@@ -486,6 +820,7 @@ function renderTemplateGrid() {
     const card = document.createElement("div");
     card.className = "tmpl-card";
     card.dataset.id = id;
+    const themeMode = THEMES[t.theme]?.mode || "dark";
     card.innerHTML = `
       <div class="label">${t.label}</div>
       <div class="desc">${t.desc}</div>
@@ -493,6 +828,7 @@ function renderTemplateGrid() {
         <span>${NARRATIVE_LABELS[t.narrative]}</span>
         <span>${DELIVERY_LABELS[t.delivery]}</span>
         <span>${t.pages.length} 页</span>
+        <span class="mode-${themeMode}">${themeMode === "dark" ? "深色" : "浅色"}</span>
       </div>`;
     card.onclick = () => applyTemplate(id);
     grid.appendChild(card);
@@ -508,10 +844,9 @@ function applyTemplate(id) {
   state.narrative = t.narrative;
   state.pages = JSON.parse(JSON.stringify(t.pages));
   state.previewPage = 0;
+  state.expandedPage = -1;
 
-  document.querySelectorAll(".tmpl-card").forEach(c => {
-    c.classList.toggle("active", c.dataset.id === id);
-  });
+  document.querySelectorAll(".tmpl-card").forEach(c => c.classList.toggle("active", c.dataset.id === id));
 
   document.getElementById("f_topic").value = t.label;
   document.getElementById("f_audience").value = "";
@@ -520,38 +855,39 @@ function applyTemplate(id) {
   document.getElementById("f_length").value = t.pages.length;
   document.getElementById("f_sections").value = Math.max(3, Math.min(6, Math.floor(t.pages.length / 2)));
   document.getElementById("f_constraints").value = "";
-  document.getElementById("f_acceptance").value =
-    t.delivery === "editable" ? "可编辑 / 无水印 / 中文正常" : "视觉震撼，适合演示/路演";
+  document.getElementById("f_acceptance").value = t.delivery === "editable" ? "可编辑 / 无水印 / 中文正常" : "视觉震撼，适合演示/路演";
 
-  document.querySelectorAll(".toggle-btn").forEach(b => {
-    b.classList.toggle("active", b.dataset.delivery === state.delivery);
-  });
+  clearFieldError("f_topic"); clearFieldError("f_length");
+
+  document.querySelectorAll(".toggle-btn").forEach(b => b.classList.toggle("active", b.dataset.delivery === state.delivery));
 
   renderThemeGrid();
   renderPages();
   updatePreview();
+  advanceStep(1);
 }
 
 // =====================================================================
-// 交付路径切换
+// 交付路径
 // =====================================================================
 function setDelivery(d) {
   state.delivery = d;
-  document.querySelectorAll(".toggle-btn").forEach(b => {
-    b.classList.toggle("active", b.dataset.delivery === d);
-  });
-  document.getElementById("f_acceptance").value =
-    d === "editable" ? "可编辑 / 无水印 / 中文正常" : "视觉震撼，适合演示/路演";
+  document.querySelectorAll(".toggle-btn").forEach(b => b.classList.toggle("active", b.dataset.delivery === d));
+  document.getElementById("f_acceptance").value = d === "editable" ? "可编辑 / 无水印 / 中文正常" : "视觉震撼，适合演示/路演";
   updatePreview();
 }
 
 // =====================================================================
-// 主题市场
+// 主题市场（含对比度检测）
 // =====================================================================
 function renderThemeGrid() {
   const grid = document.getElementById("themeGrid");
   grid.innerHTML = "";
-  for (const [id, t] of Object.entries(THEMES)) {
+  const allThemes = { ...THEMES, ...state.customThemes };
+  for (const [id, t] of Object.entries(allThemes)) {
+    const isCustom = !!state.customThemes[id];
+    const textBgRatio = contrastRatio(t.text, t.bg);
+    const grade = contrastGrade(textBgRatio);
     const card = document.createElement("div");
     card.className = "theme-card" + (id === state.theme ? " active" : "");
     card.innerHTML = `
@@ -563,16 +899,128 @@ function renderThemeGrid() {
         <div style="background:#${t.accent}"></div>
       </div>
       <div class="info">
-        <div class="name">${t.label}</div>
-        <div class="hint">#${t.primary} / #${t.accent}</div>
+        <div class="name">${t.label}
+          <span class="mode-tag mode-${t.mode || "dark"}">${t.mode === "light" ? "浅色" : "深色"}</span>
+          ${isCustom ? '<span class="custom-tag">自定义</span>' : ""}
+        </div>
+        <div class="contrast">
+          <span>文/底 ${textBgRatio}:1</span>
+          <span class="grade" style="color:${grade.color}">${grade.label}</span>
+        </div>
       </div>`;
-    card.onclick = () => { state.theme = id; renderThemeGrid(); updatePreview(); };
+    card.onclick = () => { state.theme = id; renderThemeGrid(); updatePreview(); advanceStep(3); };
     grid.appendChild(card);
   }
 }
 
 // =====================================================================
-// 叙事结构切换 → 按骨架重建页面
+// 自定义主题构建器
+// =====================================================================
+function toggleBuilder() {
+  const panel = document.getElementById("builderPanel");
+  const toggle = document.getElementById("builderToggle");
+  if (panel.classList.contains("open")) {
+    panel.classList.remove("open");
+    toggle.textContent = "+ 自定义主题";
+  } else {
+    panel.classList.add("open");
+    toggle.textContent = "— 收起自定义";
+    // initialize from current theme
+    const allThemes = { ...THEMES, ...state.customThemes };
+    const t = allThemes[state.theme] || THEMES.tech_dark;
+    for (const k of ["bg","surface","primary","secondary","text","muted","accent","line"]) {
+      document.getElementById("ct_" + k).value = "#" + t[k];
+      document.getElementById("ct_" + k + "_hex").value = t[k];
+    }
+    document.getElementById("ct_font").value = t.font || "Microsoft YaHei";
+    updateBuilderPreview();
+  }
+}
+
+function onBuilderColor(key) {
+  const color = document.getElementById("ct_" + key).value;
+  document.getElementById("ct_" + key + "_hex").value = color.replace("#", "").toUpperCase();
+  updateBuilderPreview();
+}
+
+function onBuilderHex(key) {
+  let hex = document.getElementById("ct_" + key + "_hex").value.replace(/[^0-9A-Fa-f]/g, "").toUpperCase();
+  if (hex.length === 6) {
+    document.getElementById("ct_" + key).value = "#" + hex;
+    updateBuilderPreview();
+  }
+}
+
+function getBuilderTheme() {
+  const t = {};
+  for (const k of ["bg","surface","primary","secondary","text","muted","accent","line"]) {
+    t[k] = document.getElementById("ct_" + k + "_hex").value.toUpperCase();
+  }
+  t.font = document.getElementById("ct_font").value;
+  t.label = "自定义主题";
+  t.mode = relLuminance(hexToRgb(t.bg)) < 0.5 ? "dark" : "light";
+  return t;
+}
+
+function updateBuilderPreview() {
+  const t = getBuilderTheme();
+  const preview = document.getElementById("builderPreview");
+  preview.style.background = `#${t.bg}`;
+  preview.innerHTML = `
+    <div style="color:#${t.primary}; font-size:18px; font-weight:700; margin-bottom:6px; font-family:${t.font}">标题预览</div>
+    <div style="color:#${t.text}; font-size:14px; margin-bottom:4px; font-family:${t.font}">正文内容示例 — 这是一个自定义主题的预览效果</div>
+    <div style="display:flex; gap:8px; margin-top:8px;">
+      <span style="background:#${t.accent}; color:#${t.bg}; padding:3px 10px; border-radius:4px; font-size:12px; font-weight:600;">强调按钮</span>
+      <span style="background:#${t.surface}; color:#${t.secondary}; padding:3px 10px; border-radius:4px; font-size:12px;">辅助标签</span>
+    </div>`;
+
+  // contrast info
+  const textBg = contrastRatio(t.text, t.bg);
+  const primaryBg = contrastRatio(t.primary, t.bg);
+  const accentBg = contrastRatio(t.accent, t.bg);
+  const g1 = contrastGrade(textBg);
+  const g2 = contrastGrade(primaryBg);
+  const g3 = contrastGrade(accentBg);
+  document.getElementById("builderContrast").innerHTML =
+    `对比度 — 文/底: <span class="grade-tag" style="background:${g1.color};color:#000">${textBg}:1 ${g1.label}</span> ` +
+    `主色/底: <span class="grade-tag" style="background:${g2.color};color:#000">${primaryBg}:1 ${g2.label}</span> ` +
+    `强调/底: <span class="grade-tag" style="background:${g3.color};color:#000">${accentBg}:1 ${g3.label}</span>`;
+}
+
+function saveCustomTheme() {
+  const t = getBuilderTheme();
+  const id = "custom_" + Date.now();
+  state.customThemes[id] = t;
+  localStorage.setItem("ppt_custom_themes", JSON.stringify(state.customThemes));
+  state.theme = id;
+  renderThemeGrid();
+  showToast("自定义主题已保存", "success");
+}
+
+function exportCustomTheme() {
+  const t = getBuilderTheme();
+  const blob = new Blob([JSON.stringify(t, null, 2) + "\n"], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "custom_theme.json";
+  a.click();
+  URL.revokeObjectURL(a.href);
+  showToast("主题 JSON 已导出", "success");
+}
+
+function resetBuilder() {
+  const t = THEMES.tech_dark;
+  for (const k of ["bg","surface","primary","secondary","text","muted","accent","line"]) {
+    document.getElementById("ct_" + k).value = "#" + t[k];
+    document.getElementById("ct_" + k + "_hex").value = t[k];
+  }
+  document.getElementById("ct_font").value = "Microsoft YaHei";
+  updateBuilderPreview();
+  showToast("已重置为默认配色", "info");
+}
+
+// =====================================================================
+// 叙事结构切换
 // =====================================================================
 function onNarrativeChange() {
   const n = document.getElementById("f_narrative").value;
@@ -591,42 +1039,254 @@ function onNarrativeChange() {
 }
 
 // =====================================================================
-// 页面编辑器
+// 表单校验
+// =====================================================================
+function onFormInput(fieldId) {
+  validateField(fieldId);
+  updatePreview();
+  advanceStep(2);
+}
+
+function validateField(fieldId) {
+  const el = document.getElementById(fieldId);
+  const errEl = document.getElementById("err_" + fieldId.replace("f_", ""));
+  let valid = true;
+  let warn = false;
+
+  if (fieldId === "f_topic") {
+    if (!el.value.trim()) {
+      el.classList.add("error");
+      if (errEl) errEl.classList.add("show");
+      valid = false;
+    } else {
+      el.classList.remove("error");
+      if (errEl) errEl.classList.remove("show");
+    }
+  }
+
+  if (fieldId === "f_length") {
+    const v = parseInt(el.value);
+    if (isNaN(v) || v < 4 || v > 30) {
+      el.classList.add("error");
+      if (errEl) errEl.classList.add("show");
+      valid = false;
+    } else {
+      el.classList.remove("error");
+      if (errEl) errEl.classList.remove("show");
+    }
+  }
+
+  return valid;
+}
+
+function clearFieldError(fieldId) {
+  const el = document.getElementById(fieldId);
+  const errId = "err_" + fieldId.replace("f_", "");
+  const errEl = document.getElementById(errId);
+  if (el) el.classList.remove("error", "warn");
+  if (errEl) errEl.classList.remove("show");
+}
+
+function validateAll() {
+  const ok1 = validateField("f_topic");
+  const ok2 = validateField("f_length");
+  if (!ok1) {
+    showToast("请填写主题（必填）", "error");
+    document.getElementById("f_topic").focus();
+    return false;
+  }
+  if (!ok2) {
+    showToast("页数应在 4-30 之间", "error");
+    return false;
+  }
+  if (state.pages.length === 0) {
+    showToast("请至少添加一个页面", "error");
+    return false;
+  }
+  return true;
+}
+
+// =====================================================================
+// 页面编辑器（拖拽排序 + 可展开 + 布局选择器）
 // =====================================================================
 function renderPages() {
   const list = document.getElementById("pageList");
   list.innerHTML = "";
+  if (state.pages.length === 0) {
+    list.innerHTML = '<div class="empty-state">暂无页面，点击下方按钮添加</div>';
+    return;
+  }
   state.pages.forEach((pg, i) => {
     const div = document.createElement("div");
-    div.className = "page-item";
+    div.className = "page-item" + (state.expandedPage === i ? " expanded" : "");
+    div.draggable = true;
+    div.dataset.idx = i;
+
     let typeOpts = PAGE_TYPES.map(t =>
-      `<option value="${t}" ${t === pg.type ? "selected" : ""}>${PAGE_TYPE_LABELS[t]}</option>`
+      `<option value="${t}" ${t === pg.type ? "selected" : ""}>${PAGE_TYPE_ICONS[t] || ""} ${PAGE_TYPE_LABELS[t]}</option>`
     ).join("");
+
+    const items = pg.items || [];
+    let itemsHtml = items.map((item, j) => `
+      <div class="item-row">
+        <input type="text" value="${escAttr(item)}" placeholder="要点内容"
+               oninput="updatePageItem(${i}, ${j}, this.value)">
+        <button class="del-btn" onclick="delPageItem(${i}, ${j})" style="width:24px;height:24px;font-size:14px">&times;</button>
+      </div>`).join("");
+    if (items.length === 0 && ["content","two_column","list_page","detail_page","form_page","dashboard","comparison","stats","media"].includes(pg.type)) {
+      itemsHtml = '<div style="font-size:11px;color:var(--muted);margin-bottom:4px;">该布局支持要点，点击下方添加</div>';
+    }
+
     div.innerHTML = `
-      <div class="pg-num">${i + 1}</div>
-      <select onchange="updatePageType(${i}, this.value)">${typeOpts}</select>
-      <input type="text" value="${escHtml(pg.title || "")}" placeholder="页面标题"
-             oninput="updatePageTitle(${i}, this.value)">
-      <button class="del-btn" onclick="delPage(${i})">&times;</button>`;
+      <div class="page-item-header" onclick="toggleExpandPage(${i})">
+        <span class="drag-handle" title="拖拽排序">⋮⋮</span>
+        <div class="pg-num">${i + 1}</div>
+        <span class="pg-type-icon">${PAGE_TYPE_ICONS[pg.type] || "📄"}</span>
+        <span class="pg-type-label">${PAGE_TYPE_LABELS[pg.type] || pg.type}</span>
+        <span class="pg-title">${escHtml(pg.title || "(未命名)")}</span>
+        <span class="expand-arrow">▶</span>
+      </div>
+      <div class="page-item-body">
+        <div class="body-row">
+          <select onchange="updatePageType(${i}, this.value)">${typeOpts}</select>
+          <input type="text" value="${escAttr(pg.title || "")}" placeholder="页面标题"
+                 oninput="updatePageTitle(${i}, this.value)">
+          <button class="del-btn" onclick="delPage(${i})" title="删除此页">&times;</button>
+        </div>
+        <div class="items-editor">
+          ${itemsHtml}
+          <button class="add-item-btn" onclick="addPageItem(${i})">+ 添加要点</button>
+        </div>
+      </div>`;
+
+    // drag events
+    div.addEventListener("dragstart", onDragStart);
+    div.addEventListener("dragover", onDragOver);
+    div.addEventListener("drop", onDrop);
+    div.addEventListener("dragend", onDragEnd);
+    div.addEventListener("dragleave", onDragLeave);
+
     list.appendChild(div);
   });
 }
 
-function addPage() {
-  state.pages.push({ type: "content", title: "", items: [] });
+let dragIdx = null;
+
+function onDragStart(e) {
+  dragIdx = parseInt(this.dataset.idx);
+  this.classList.add("dragging");
+  e.dataTransfer.effectAllowed = "move";
+}
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+  this.classList.add("drag-over");
+}
+function onDragLeave() { this.classList.remove("drag-over"); }
+function onDrop(e) {
+  e.preventDefault();
+  this.classList.remove("drag-over");
+  const dropIdx = parseInt(this.dataset.idx);
+  if (dragIdx !== null && dragIdx !== dropIdx) {
+    const [moved] = state.pages.splice(dragIdx, 1);
+    state.pages.splice(dropIdx, 0, moved);
+    renderPages();
+    updatePreview();
+  }
+}
+function onDragEnd() {
+  document.querySelectorAll(".page-item").forEach(el => el.classList.remove("dragging", "drag-over"));
+  dragIdx = null;
+}
+
+function toggleExpandPage(i) {
+  state.expandedPage = state.expandedPage === i ? -1 : i;
+  renderPages();
+}
+
+function updatePageType(i, val) { state.pages[i].type = val; updatePreview(); }
+function updatePageTitle(i, val) { state.pages[i].title = val; updatePreview(); renderPages(); }
+function updatePageItem(i, j, val) { state.pages[i].items[j] = val; updatePreview(); }
+function addPageItem(i) {
+  if (!state.pages[i].items) state.pages[i].items = [];
+  state.pages[i].items.push("");
+  renderPages();
+  // re-expand
+  state.expandedPage = i;
+  renderPages();
+}
+function delPageItem(i, j) {
+  state.pages[i].items.splice(j, 1);
+  state.expandedPage = i;
   renderPages();
   updatePreview();
 }
 
 function delPage(i) {
   state.pages.splice(i, 1);
+  if (state.expandedPage === i) state.expandedPage = -1;
+  else if (state.expandedPage > i) state.expandedPage--;
   if (state.previewPage >= state.pages.length) state.previewPage = Math.max(0, state.pages.length - 1);
   renderPages();
   updatePreview();
+  showToast("页面已删除", "info");
 }
 
-function updatePageType(i, val) { state.pages[i].type = val; updatePreview(); }
-function updatePageTitle(i, val) { state.pages[i].title = val; updatePreview(); }
+// =====================================================================
+// 布局选择器弹窗
+// =====================================================================
+function renderLayoutGrid() {
+  const grid = document.getElementById("layoutGrid");
+  grid.innerHTML = "";
+  // show all 18 types
+  for (const [type, info] of Object.entries(LAYOUT_TEMPLATES)) {
+    const card = document.createElement("div");
+    card.className = "layout-card";
+    card.innerHTML = `
+      <div class="layout-icon">${info.icon}</div>
+      <div class="layout-name">${info.label}</div>
+      <div class="layout-desc">${info.desc}</div>`;
+    card.onclick = () => addLayoutPage(type);
+    grid.appendChild(card);
+  }
+  // also show existing types that aren't in LAYOUT_TEMPLATES
+  for (const type of PAGE_TYPES) {
+    if (LAYOUT_TEMPLATES[type]) continue;
+    const card = document.createElement("div");
+    card.className = "layout-card";
+    card.innerHTML = `
+      <div class="layout-icon">${PAGE_TYPE_ICONS[type] || "📄"}</div>
+      <div class="layout-name">${PAGE_TYPE_LABELS[type]}</div>
+      <div class="layout-desc">标准页面布局</div>`;
+    card.onclick = () => addLayoutPage(type);
+    grid.appendChild(card);
+  }
+}
+
+function openLayoutPicker() {
+  document.getElementById("layoutModal").classList.add("show");
+}
+
+function closeLayoutPicker() {
+  document.getElementById("layoutModal").classList.remove("show");
+}
+
+function addLayoutPage(type) {
+  const lt = LAYOUT_TEMPLATES[type];
+  const newPage = {
+    type: type,
+    title: lt ? lt.defaultTitle : "",
+    items: lt ? [...lt.defaultItems] : [],
+  };
+  state.pages.push(newPage);
+  state.expandedPage = state.pages.length - 1;
+  document.getElementById("f_length").value = state.pages.length;
+  renderPages();
+  updatePreview();
+  closeLayoutPicker();
+  advanceStep(4);
+  showToast(`已添加${PAGE_TYPE_LABELS[type]}`, "success");
+}
 
 // =====================================================================
 // 构建 Brief JSON
@@ -651,11 +1311,12 @@ function buildBrief() {
 function val(id) { return document.getElementById(id).value.trim(); }
 
 // =====================================================================
-// 实时预览
+// 实时预览（支持全部 18 种页面类型）
 // =====================================================================
 function updatePreview() {
   const brief = buildBrief();
-  const theme = THEMES[state.theme] || THEMES.tech_dark;
+  const allThemes = { ...THEMES, ...state.customThemes };
+  const theme = allThemes[state.theme] || THEMES.tech_dark;
   const slide = document.getElementById("previewSlide");
   const content = document.getElementById("previewContent");
 
@@ -664,161 +1325,207 @@ function updatePreview() {
   const pgIdx = Math.min(state.previewPage, state.pages.length - 1);
   const pg = state.pages[pgIdx] || { type: "cover", title: brief.topic };
 
+  const tc = `#${theme.primary}`;   // title color
+  const xc = `#${theme.text}`;      // text color
+  const mc = `#${theme.muted}`;     // muted color
+  const ac = `#${theme.accent}`;    // accent color
+  const sc = `#${theme.surface}`;   // surface color
+  const scd = `#${theme.secondary}`; // secondary color
+  const lc = `#${theme.line}`;      // line color
+  const bgc = `#${theme.bg}`;       // bg color
+  const font = theme.font || "Microsoft YaHei";
+
+  content.style.fontFamily = font;
   let html = "";
-  const titleColor = `#${theme.primary}`;
-  const textColor = `#${theme.text}`;
-  const mutedColor = `#${theme.muted}`;
-  const accentColor = `#${theme.accent}`;
-  const surfaceColor = `#${theme.surface}`;
-  const secondaryColor = `#${theme.secondary}`;
 
   switch (pg.type) {
     case "cover":
-      html = `
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-          <div style="font-size:11px; color:${accentColor}; letter-spacing:3px; margin-bottom:8px;">${escHtml(brief.topic || "未命名")}</div>
-          <div style="font-size:28px; font-weight:700; color:${titleColor}; line-height:1.3;">${escHtml(pg.title || "幻灯片标题")}</div>
-          ${brief.audience ? `<div style="font-size:13px; color:${mutedColor}; margin-top:12px;">面向 ${escHtml(brief.audience)}</div>` : ""}
-        </div>`;
+      html = `<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+        <div style="font-size:11px;color:${ac};letter-spacing:3px;margin-bottom:8px;">${escHtml(brief.topic || "未命名")}</div>
+        <div style="font-size:28px;font-weight:700;color:${tc};line-height:1.3;">${escHtml(pg.title || "幻灯片标题")}</div>
+        ${brief.audience ? `<div style="font-size:13px;color:${mc};margin-top:12px;">面向 ${escHtml(brief.audience)}</div>` : ""}
+      </div>`;
       break;
     case "section":
-      html = `
-        <div style="flex:1; display:flex; align-items:center;">
-          <div style="border-left:4px solid ${accentColor}; padding-left:20px;">
-            <div style="font-size:48px; font-weight:800; color:${titleColor};">${escHtml(pg.title || "章节")}</div>
-            <div style="font-size:14px; color:${mutedColor}; margin-top:8px;">${escHtml(brief.topic || "")}</div>
-          </div>
-        </div>`;
+      html = `<div style="flex:1;display:flex;align-items:center;">
+        <div style="border-left:4px solid ${ac};padding-left:20px;">
+          <div style="font-size:48px;font-weight:800;color:${tc};">${escHtml(pg.title || "章节")}</div>
+          <div style="font-size:14px;color:${mc};margin-top:8px;">${escHtml(brief.topic || "")}</div>
+        </div>
+      </div>`;
       break;
     case "quote":
-      html = `
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-          <div style="font-size:36px; color:${accentColor}; margin-bottom:8px;">&ldquo;</div>
-          <div style="font-size:22px; font-weight:600; color:${textColor}; line-height:1.5; max-width:80%;">${escHtml(pg.title || "金句")}</div>
-          <div style="font-size:13px; color:${mutedColor}; margin-top:16px;">&mdash; ${escHtml(brief.topic || "")}</div>
-        </div>`;
+      html = `<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+        <div style="font-size:36px;color:${ac};margin-bottom:8px;">&ldquo;</div>
+        <div style="font-size:22px;font-weight:600;color:${xc};line-height:1.5;max-width:80%;">${escHtml(pg.title || "金句")}</div>
+        <div style="font-size:13px;color:${mc};margin-top:16px;">&mdash; ${escHtml(brief.topic || "")}</div>
+      </div>`;
       break;
     case "content":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px; border-bottom:2px solid ${surfaceColor}; padding-bottom:8px;">${escHtml(pg.title || "内容")}</div>
-        <div style="flex:1;">
-          ${(pg.items||[]).map((item, i) => `
-            <div style="display:flex; align-items:start; gap:10px; margin-bottom:10px;">
-              <div style="background:${accentColor}; color:#${theme.bg}; font-size:11px; font-weight:700; width:20px; height:20px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;">${i+1}</div>
-              <div style="font-size:14px; color:${textColor};">${escHtml(item)}</div>
-            </div>`).join("")}
-          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px; color:${mutedColor};">添加要点到此页面……</div>` : ""}
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;border-bottom:2px solid ${sc};padding-bottom:8px;">${escHtml(pg.title || "内容")}</div>
+        <div style="flex:1;">${(pg.items||[]).map((item,i) => `<div style="display:flex;align-items:start;gap:10px;margin-bottom:10px;">
+          <div style="background:${ac};color:${bgc};font-size:11px;font-weight:700;width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;">${i+1}</div>
+          <div style="font-size:14px;color:${xc};">${escHtml(item)}</div></div>`).join("")}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px;color:${mc};">添加要点到此页面……</div>` : ""}
         </div>`;
       break;
     case "two_column":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "双栏")}</div>
-        <div style="flex:1; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
-          <div style="background:${surfaceColor}; border-radius:8px; padding:16px;">
-            <div style="font-size:12px; color:${secondaryColor}; font-weight:600; margin-bottom:8px;">左栏</div>
-            <div style="font-size:14px; color:${textColor};">${escHtml((pg.items||[])[0] || "……")}</div>
-          </div>
-          <div style="background:${surfaceColor}; border-radius:8px; padding:16px;">
-            <div style="font-size:12px; color:${accentColor}; font-weight:600; margin-bottom:8px;">右栏</div>
-            <div style="font-size:14px; color:${textColor};">${escHtml((pg.items||[])[1] || "……")}</div>
-          </div>
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;">${escHtml(pg.title || "双栏")}</div>
+        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div style="background:${sc};border-radius:8px;padding:16px;"><div style="font-size:12px;color:${scd};font-weight:600;margin-bottom:8px;">左栏</div><div style="font-size:14px;color:${xc};">${escHtml((pg.items||[])[0] || "……")}</div></div>
+          <div style="background:${sc};border-radius:8px;padding:16px;"><div style="font-size:12px;color:${ac};font-weight:600;margin-bottom:8px;">右栏</div><div style="font-size:14px;color:${xc};">${escHtml((pg.items||[])[1] || "……")}</div></div>
         </div>`;
       break;
     case "media":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "图文")}</div>
-        <div style="flex:1; background:${surfaceColor}; border-radius:8px; display:flex; align-items:center; justify-content:center;">
-          <div style="font-size:40px; opacity:.3;">&#128247;</div>
-        </div>`;
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;">${escHtml(pg.title || "图文")}</div>
+        <div style="flex:1;background:${sc};border-radius:8px;display:flex;align-items:center;justify-content:center;"><div style="font-size:40px;opacity:.3;">&#128247;</div></div>`;
       break;
     case "chart":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "图表")}</div>
-        <div style="flex:1; background:${surfaceColor}; border-radius:8px; padding:16px; display:flex; align-items:flex-end; gap:12px;">
-          <div style="flex:1; background:${secondaryColor}; border-radius:4px 4px 0 0; height:60%;"></div>
-          <div style="flex:1; background:${accentColor}; border-radius:4px 4px 0 0; height:85%;"></div>
-          <div style="flex:1; background:${titleColor}; border-radius:4px 4px 0 0; height:45%;"></div>
-          <div style="flex:1; background:${secondaryColor}; border-radius:4px 4px 0 0; height:70%;"></div>
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;">${escHtml(pg.title || "图表")}</div>
+        <div style="flex:1;background:${sc};border-radius:8px;padding:16px;display:flex;align-items:flex-end;gap:12px;">
+          <div style="flex:1;background:${scd};border-radius:4px 4px 0 0;height:60%;"></div><div style="flex:1;background:${ac};border-radius:4px 4px 0 0;height:85%;"></div>
+          <div style="flex:1;background:${tc};border-radius:4px 4px 0 0;height:45%;"></div><div style="flex:1;background:${scd};border-radius:4px 4px 0 0;height:70%;"></div>
         </div>`;
       break;
     case "agenda":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "议程")}</div>
-        <div style="flex:1;">
-          ${["01","02","03","04"].map((n,i) => `
-            <div style="display:flex; gap:12px; margin-bottom:10px; align-items:center;">
-              <span style="font-size:20px; font-weight:800; color:${accentColor};">${n}</span>
-              <span style="font-size:14px; color:${textColor};">议程项 ${i+1}</span>
-            </div>`).join("")}
-        </div>`;
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;">${escHtml(pg.title || "议程")}</div>
+        <div style="flex:1;">${["01","02","03","04"].map((n,i) => `<div style="display:flex;gap:12px;margin-bottom:10px;align-items:center;">
+          <span style="font-size:20px;font-weight:800;color:${ac};">${n}</span><span style="font-size:14px;color:${xc};">议程项 ${i+1}</span></div>`).join("")}</div>`;
       break;
     case "summary":
-      html = `
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
-          <div style="font-size:11px; color:${accentColor}; letter-spacing:3px; margin-bottom:8px;">总结</div>
-          <div style="font-size:26px; font-weight:700; color:${titleColor}; line-height:1.3;">${escHtml(pg.title || "总结")}</div>
-          <div style="margin-top:20px; padding:10px 24px; background:${accentColor}; color:#${theme.bg}; border-radius:24px; font-size:14px; font-weight:600;">行动号召</div>
-        </div>`;
+      html = `<div style="flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;">
+        <div style="font-size:11px;color:${ac};letter-spacing:3px;margin-bottom:8px;">总结</div>
+        <div style="font-size:26px;font-weight:700;color:${tc};line-height:1.3;">${escHtml(pg.title || "总结")}</div>
+        <div style="margin-top:20px;padding:10px 24px;background:${ac};color:${bgc};border-radius:24px;font-size:14px;font-weight:600;">行动号召</div>
+      </div>`;
       break;
     case "contact":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "联系方式")}</div>
-        <div style="flex:1; display:flex; flex-direction:column; justify-content:center; gap:10px;">
-          <div style="font-size:14px; color:${textColor};">&#9742; contact@example.com</div>
-          <div style="font-size:14px; color:${mutedColor};">&#127759; www.example.com</div>
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;">${escHtml(pg.title || "联系方式")}</div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px;">
+          <div style="font-size:14px;color:${xc};">&#9742; contact@example.com</div><div style="font-size:14px;color:${mc};">&#127759; www.example.com</div>
         </div>`;
       break;
     case "table":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "表格")}</div>
-        <div style="flex:1; background:${surfaceColor}; border-radius:8px; padding:12px;">
-          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:1px; background:${surfaceColor};">
-            ${["列 A","列 B","列 C","——","——","——","——","——","——"].map((c,i) =>
-              `<div style="background:#${theme.bg}; padding:8px; font-size:12px; color:${i<3?accentColor:textColor}; font-weight:${i<3?600:400};">${c}</div>`
-            ).join("")}
-          </div>
-        </div>`;
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;">${escHtml(pg.title || "表格")}</div>
+        <div style="flex:1;background:${sc};border-radius:8px;padding:12px;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:${sc};">
+            ${["列 A","列 B","列 C","——","——","——","——","——","——"].map((c,i) => `<div style="background:${bgc};padding:8px;font-size:12px;color:${i<3?ac:xc};font-weight:${i<3?600:400};">${c}</div>`).join("")}
+          </div></div>`;
       break;
     case "timeline":
-      html = `
-        <div style="font-size:22px; font-weight:700; color:${titleColor}; margin-bottom:16px;">${escHtml(pg.title || "时间线")}</div>
-        <div style="flex:1; display:flex; align-items:center; justify-content:space-around; position:relative;">
-          <div style="position:absolute; left:10%; right:10%; top:50%; height:2px; background:${accentColor};"></div>
-          ${["Q1","Q2","Q3","Q4"].map(q => `
-            <div style="position:relative; z-index:1; text-align:center;">
-              <div style="width:32px; height:32px; border-radius:50%; background:${accentColor}; border:3px solid #${theme.bg}; margin:0 auto 6px;"></div>
-              <div style="font-size:12px; color:${mutedColor};">${q}</div>
-            </div>`).join("")}
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:16px;">${escHtml(pg.title || "时间线")}</div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-around;position:relative;">
+          <div style="position:absolute;left:10%;right:10%;top:50%;height:2px;background:${ac};"></div>
+          ${["Q1","Q2","Q3","Q4"].map(q => `<div style="position:relative;z-index:1;text-align:center;">
+            <div style="width:32px;height:32px;border-radius:50%;background:${ac};border:3px solid ${bgc};margin:0 auto 6px;"></div>
+            <div style="font-size:12px;color:${mc};">${q}</div></div>`).join("")}
         </div>`;
       break;
+
+    // ============ 新增布局类型预览 ============
+    case "list_page":
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:14px;border-bottom:2px solid ${sc};padding-bottom:6px;">${escHtml(pg.title || "列表页")}</div>
+        <div style="flex:1;overflow:hidden;">
+          ${(pg.items||[]).map((item,i) => {
+            const parts = item.split("："); const head = parts[0]; const desc = parts.slice(1).join("：");
+            return `<div style="display:flex;align-items:start;gap:10px;margin-bottom:8px;padding:8px 10px;background:${sc};border-radius:6px;border-left:3px solid ${ac};">
+              <span style="font-size:16px;">${["📋","✅","🎯","💡","🚀","📌"][i%6]}</span>
+              <div><div style="font-size:13px;font-weight:600;color:${xc};">${escHtml(head)}</div>
+              ${desc ? `<div style="font-size:11px;color:${mc};margin-top:2px;">${escHtml(desc)}</div>` : ""}</div>
+            </div>`;
+          }).join("")}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px;color:${mc};">添加列表项……</div>` : ""}
+        </div>`;
+      break;
+    case "detail_page":
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:14px;">${escHtml(pg.title || "详情页")}</div>
+        <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          ${(pg.items||[]).map((item,i) => {
+            const parts = item.split("："); const k = parts[0]; const v = parts.slice(1).join("：") || "——";
+            return `<div style="background:${sc};border-radius:6px;padding:10px 12px;">
+              <div style="font-size:11px;color:${mc};margin-bottom:4px;">${escHtml(k)}</div>
+              <div style="font-size:14px;font-weight:600;color:${xc};">${escHtml(v)}</div>
+            </div>`;
+          }).join("")}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px;color:${mc};grid-column:1/-1;">添加详情项……</div>` : ""}
+        </div>`;
+      break;
+    case "form_page":
+      html = `<div style="font-size:22px;font-weight:700;color:${tc};margin-bottom:14px;">${escHtml(pg.title || "表单页")}</div>
+        <div style="flex:1;display:flex;flex-direction:column;gap:10px;">
+          ${(pg.items||[]).map(item => {
+            const label = item.replace(/[：:].*/,"");
+            return `<div style="display:flex;align-items:center;gap:12px;">
+              <label style="font-size:13px;color:${mc};width:80px;flex-shrink:0;text-align:right;">${escHtml(label)}</label>
+              <div style="flex:1;border-bottom:1px solid ${lc};padding:6px 0;font-size:13px;color:${mc};">${"&nbsp;".repeat(8)}</div>
+            </div>`;
+          }).join("")}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px;color:${mc};">添加表单字段……</div>` : ""}
+        </div>`;
+      break;
+    case "dashboard":
+      html = `<div style="font-size:20px;font-weight:700;color:${tc};margin-bottom:12px;">${escHtml(pg.title || "仪表盘")}</div>
+        <div style="flex:1;display:grid;grid-template-columns:repeat(2,1fr);gap:10px;">
+          ${(pg.items||[]).map((item,i) => {
+            const parts = item.split(/[：:]/); const k = parts[0]; const v = parts.slice(1).join("：") || "——";
+            const colors = [ac, scd, tc, "#E8B04B"];
+            return `<div style="background:${sc};border-radius:8px;padding:12px;display:flex;flex-direction:column;justify-content:center;border-top:3px solid ${colors[i%4]};">
+              <div style="font-size:22px;font-weight:800;color:${colors[i%4]};">${escHtml(v)}</div>
+              <div style="font-size:11px;color:${mc};margin-top:2px;">${escHtml(k)}</div>
+            </div>`;
+          }).join("")}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px;color:${mc};grid-column:1/-1;">添加数据卡片……</div>` : ""}
+        </div>`;
+      break;
+    case "comparison":
+      html = `<div style="font-size:20px;font-weight:700;color:${tc};margin-bottom:12px;">${escHtml(pg.title || "对比页")}</div>
+        <div style="flex:1;display:grid;grid-template-columns:repeat(${Math.min((pg.items||[]).length||3,4)},1fr);gap:10px;">
+          ${(pg.items||[]).map((item,i) => {
+            const parts = item.split(/[：:]/); const name = parts[0]; const desc = parts.slice(1).join("：");
+            const isHighlight = i === 1;
+            return `<div style="background:${isHighlight?ac:sc};border-radius:8px;padding:12px;border:${isHighlight?"2px solid "+ac:"1px solid "+lc};">
+              <div style="font-size:14px;font-weight:700;color:${isHighlight?bgc:tc};margin-bottom:6px;">${escHtml(name)}</div>
+              <div style="font-size:11px;color:${isHighlight?bgc:mc};line-height:1.4;">${escHtml(desc)}</div>
+            </div>`;
+          }).join("")}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px;color:${mc};grid-column:1/-1;">添加对比项……</div>` : ""}
+        </div>`;
+      break;
+    case "stats":
+      html = `<div style="font-size:20px;font-weight:700;color:${tc};margin-bottom:12px;">${escHtml(pg.title || "数据统计")}</div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:space-around;gap:10px;">
+          ${(pg.items||[]).map((item,i) => {
+            const parts = item.split(/[ 　]/); const num = parts[0]; const label = parts.slice(1).join(" ") || item;
+            const colors = [ac, scd, tc, "#E8B04B", "#FF8FB1"];
+            return `<div style="text-align:center;">
+              <div style="font-size:32px;font-weight:800;color:${colors[i%5]};">${escHtml(num)}</div>
+              <div style="font-size:11px;color:${mc};margin-top:4px;">${escHtml(label)}</div>
+            </div>`;
+          }).join("")}
+          ${(!pg.items||pg.items.length===0) ? `<div style="font-size:14px;color:${mc};">添加统计指标……</div>` : ""}
+        </div>`;
+      break;
+
     default:
-      html = `<div style="font-size:20px; color:${titleColor};">${escHtml(pg.title || "幻灯片")}</div>`;
+      html = `<div style="font-size:20px;color:${tc};">${escHtml(pg.title || "幻灯片")}</div>`;
   }
 
   content.innerHTML = html;
-
-  document.getElementById("pgInfo").textContent =
-    `${pgIdx + 1} / ${state.pages.length}`;
-
-  document.getElementById("jsonView").textContent =
-    JSON.stringify(brief, null, 2);
+  document.getElementById("pgInfo").textContent = `${pgIdx + 1} / ${state.pages.length}`;
+  document.getElementById("jsonView").textContent = JSON.stringify(brief, null, 2);
 
   const ext = state.delivery === "showcase" ? "html" : "pptx";
-  document.getElementById("cmdBox").textContent =
-    `python3 scripts/generate.py brief.json --out output/deck.${ext}`;
+  document.getElementById("cmdBox").textContent = `python3 scripts/generate.py brief.json --out output/deck.${ext}`;
 }
 
-function prevPreviewPage() {
-  if (state.previewPage > 0) { state.previewPage--; updatePreview(); }
-}
-function nextPreviewPage() {
-  if (state.previewPage < state.pages.length - 1) { state.previewPage++; updatePreview(); }
-}
+function prevPreviewPage() { if (state.previewPage > 0) { state.previewPage--; updatePreview(); } }
+function nextPreviewPage() { if (state.previewPage < state.pages.length - 1) { state.previewPage++; updatePreview(); } }
 
 // =====================================================================
 // 导出
 // =====================================================================
 function downloadBrief() {
+  if (!validateAll()) return;
   const brief = buildBrief();
   const blob = new Blob([JSON.stringify(brief, null, 2) + "\n"], { type: "application/json" });
   const a = document.createElement("a");
@@ -826,14 +1533,16 @@ function downloadBrief() {
   a.download = "brief.json";
   a.click();
   URL.revokeObjectURL(a.href);
-  showToast("brief.json 已下载");
+  showToast("brief.json 已下载", "success");
+  advanceStep(5);
 }
 
 function copyBrief() {
+  if (!validateAll()) return;
   const brief = buildBrief();
   navigator.clipboard.writeText(JSON.stringify(brief, null, 2)).then(
-    () => showToast("简报 JSON 已复制到剪贴板"),
-    () => showToast("复制失败，请手动选择 JSON")
+    () => showToast("简报 JSON 已复制到剪贴板", "success"),
+    () => showToast("复制失败，请手动选择 JSON", "error")
   );
 }
 
@@ -841,25 +1550,55 @@ function copyCommand() {
   const ext = state.delivery === "showcase" ? "html" : "pptx";
   const cmd = `python3 scripts/generate.py brief.json --out output/deck.${ext}`;
   navigator.clipboard.writeText(cmd).then(
-    () => showToast("命令已复制"),
-    () => showToast("复制失败")
+    () => showToast("命令已复制", "success"),
+    () => showToast("复制失败", "error")
   );
 }
 
 // =====================================================================
-// 工具函数
+// Toast（多类型）
 // =====================================================================
-function showToast(msg) {
-  const t = document.getElementById("toast");
+function showToast(msg, type = "success") {
+  const container = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
   t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
+  container.appendChild(t);
+  setTimeout(() => t.classList.add("show"), 10);
+  setTimeout(() => { t.classList.remove("show"); setTimeout(() => t.remove(), 300); }, 2500);
 }
 
+// =====================================================================
+// 键盘快捷键
+// =====================================================================
+document.addEventListener("keydown", (e) => {
+  // don't intercept when typing in inputs
+  if (["INPUT","TEXTAREA","SELECT"].includes(e.target.tagName)) {
+    if (e.ctrlKey && e.key === "s") { e.preventDefault(); copyBrief(); }
+    return;
+  }
+  if (e.key === "ArrowLeft") { e.preventDefault(); prevPreviewPage(); }
+  else if (e.key === "ArrowRight") { e.preventDefault(); nextPreviewPage(); }
+  else if (e.ctrlKey && e.key === "d") { e.preventDefault(); downloadBrief(); }
+  else if (e.ctrlKey && e.key === "s") { e.preventDefault(); copyBrief(); }
+  else if (e.key === "Escape") { closeLayoutPicker(); }
+});
+
+// close modal on overlay click
+document.getElementById("layoutModal").addEventListener("click", (e) => {
+  if (e.target.id === "layoutModal") closeLayoutPicker();
+});
+
+// =====================================================================
+// 工具函数
+// =====================================================================
 function escHtml(s) {
   if (!s) return "";
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+function escAttr(s) {
+  if (!s) return "";
+  return String(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
 }
 
 // =====================================================================

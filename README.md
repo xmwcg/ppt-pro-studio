@@ -18,14 +18,14 @@
 | `scripts/ppt_studio_generate.py` | **Fallback** deterministic python-pptx renderer. P3-6 pre-calculation overflow control, 13 slide types, native charts, image+text mixed layout, speaker notes. |
 | `scripts/ppt_marp.py` | **Showcase** renderer: brief → Marp Markdown → HTML/PDF/PPTX (visual ceiling for presentations/roadshows). |
 | `scripts/generate.py` | **Unified entry**: routes by `brief.delivery` — `editable` → core engine, `showcase` → Marp HTML. |
-| `scripts/template_market.py` | **Template market** CLI: 10 industry templates (pitch, course, annual review, product launch, XHS, gov, medical, e-com, guochao, fintech). |
-| `scripts/theme_market.py` | **Theme market** CLI + loader: 12 themes, `list` / `show` / `validate` / `init`. |
+| `scripts/template_market.py` | **Template market** CLI: 13 industry templates (pitch, course, annual review, product launch, XHS, gov, medical, e-com, guochao, fintech, **product spec, data report, project plan**). |
+| `scripts/theme_market.py` | **Theme market** CLI + loader: 12 themes with `mode` (dark/light) + WCAG contrast checking (`list` / `show` / `validate` / `init`). |
 | `scripts/prompt_enhance.py` | Offline brief scaffolder with narrative structure (persuade/inform/teach/inspire) + delivery routing. |
 | `scripts/qa2.py` | QA 2.1 layout audit: bounds, placeholders, font floor, CJK font, WCAG contrast, truncation, image upscale, HTML path audit, score. |
 | `scripts/collab.py` | Collaboration: `serve` (LAN preview), `export` (brief→Markdown for Lexiang/Tencent Docs), `init` (git project scaffold). |
 | `scripts/add_transitions.py` | Injects random per-slide transitions via ppt-master's OOXML transition core. |
 | `scripts/icons.py` | Embedded offline icon library (~50 vector icons, OOXML `custGeom`, WPS-editable). |
-| `ui/console.html` | **UI Console** (P3-10): zero-dependency local web form — template picker, theme cards, narrative dropdown, live slide preview, one-click brief export. |
+| `ui/console.html` | **UI Console** (v1.3.0): zero-dependency local web form — 13 templates, 18 page layouts, custom theme builder, WCAG contrast, step bar, drag-reorder, keyboard shortcuts, live preview, one-click export. |
 | `vendor/ppt-master-scripts/` | Bundled ppt-master v3.1.0 converter + transition core (offline, MIT). |
 | `mcp-server/ppt-studio-mcp.js` | Zero-dependency MCP server (stdio). Tools: `generate_ppt`, `qa_check`, `list_styles`, `list_templates`. |
 | `references/prompt-refiner-PROMPT.md` | The mandatory first-step prompt-enhancer (MIT, from xie-maker/prompt-refiner-skill). |
@@ -73,19 +73,27 @@ dynamic line spacing + transitions. Auto-used if the primary path is unavailable
 
 Universal: connect `ppt-studio-mcp` and call `generate_ppt` (internally routes by delivery: showcase→Marp, editable→primary→fallback).
 
-## P3 capabilities (v1.2.0)
+## P3 capabilities (v1.3.0)
 
-- **Template Market** — 10 industry templates: startup pitch, course lecture, annual review,
+- **Template Market** — 13 industry templates: startup pitch, course lecture, annual review,
   product launch, XHS knowledge card, gov report, medical science, e-com promo, guochao brand,
-  fintech report. `python3 scripts/template_market.py list` to browse; `apply <id> --out brief.json` to scaffold.
+  fintech report, **product spec, data report, project plan** (new).
+  `python3 scripts/template_market.py list` to browse; `apply <id> --out brief.json` to scaffold.
+- **18 Page Layout Types** — 12 original (cover/section/content/two_column/media/chart/table/
+  timeline/quote/agenda/summary/contact) + **6 new**: list_page, detail_page, form_page,
+  dashboard, comparison, stats. All registered in the rendering engine.
 - **Narrative Structure** — 4 skeletons (persuade/inform/teach/inspire), each with a per-page
   type mapping. Auto-selected from goal; overridable via brief `narrative` field.
 - **Delivery Routing** — `editable` (default, core engine → native .pptx) vs `showcase` (Marp → visual HTML).
   Auto-detected from user intent; overridable via brief `delivery` field.
-- **Theme Market** — 12 bundled, editable themes in `themes/` (incl. `fintech_green`,
-  `sunset_orange`, `mono_ink`, `guochao_red`, `medical_blue`, `ecommerce_orange`, `gov_red`).
-- **UI Console** — `ui/console.html`: zero-dependency local web form with template picker,
-  theme cards, narrative dropdown, live slide preview, one-click brief export.
+- **Theme Market** — 12 bundled themes with `mode` (dark/light) + **WCAG contrast checking**
+  (`contrast_ratio()`, `check_contrast()`, `contrast_grade()`). All 12 pass AAA (≥7:1).
+  `python3 scripts/theme_market.py show tech_dark` for full contrast report.
+- **Custom Theme Builder** — UI console color pickers for 8 tokens + font, live preview with
+  real-time WCAG contrast display, save to localStorage or export JSON.
+- **UI Console** — `ui/console.html` (v1.3.0): step progress bar, form validation, drag-to-reorder
+  pages, expandable page editor with item editing, layout picker modal (18 types),
+  keyboard shortcuts (←→/Ctrl+D/Ctrl+S/Esc), multi-type toasts.
 - **Collaboration** — `scripts/collab.py`: git versioning (`init`), LAN preview (`serve`),
   brief→Markdown export for Lexiang/Tencent Docs import (`export`). See `COLLABORATION.md`.
 - **QA 2.1** — CJK font detection, WCAG contrast, truncation verification, image upscale check,

@@ -167,6 +167,75 @@ BUILTIN_TEMPLATES = {
             {"type": "summary", "title": "投资建议"},
         ],
     },
+    # -- new templates using P3-12 page layout types --
+    "product_spec": {
+        "label": "产品规格 (Product Spec)",
+        "description": "产品详情页：规格参数 → 功能清单 → 数据看板 → 对比",
+        "theme": "tech_dark", "narrative": "inform", "delivery": "editable",
+        "pages": [
+            {"type": "cover", "title": "产品名 + 版本号"},
+            {"type": "detail_page", "title": "产品规格", "items": [
+                "产品名称：PPT Pro Studio", "版本：v1.3.0",
+                "授权协议：MIT", "适用平台：Windows / macOS / Linux"]},
+            {"type": "list_page", "title": "核心功能", "items": [
+                "双引擎渲染：SVG 高保真 + python-pptx 确定性回退",
+                "模板市场：10+ 行业模板一键应用",
+                "主题系统：12 套主题 + 自定义配色 + WCAG 对比度检测",
+                "QA 2.1：程序化排版审计，100 分才交付"]},
+            {"type": "dashboard", "title": "性能指标", "items": [
+                "渲染速度：2.3s", "QA 评分：100/100",
+                "页面类型：18 种", "主题数：12+"]},
+            {"type": "comparison", "title": "方案对比", "items": [
+                "方案 A：低成本、周期长",
+                "方案 B：均衡型、推荐",
+                "方案 C：高投入、快速上线"]},
+            {"type": "summary", "title": "总结与推荐"},
+        ],
+    },
+    "data_report": {
+        "label": "数据报告 (Data Report)",
+        "description": "数据驱动报告：概览仪表盘 → 统计指标 → 详情 → 对比 → 结论",
+        "theme": "fintech_green", "narrative": "inform", "delivery": "editable",
+        "pages": [
+            {"type": "cover", "title": "季度数据报告"},
+            {"type": "agenda", "title": "报告议程"},
+            {"type": "dashboard", "title": "运营概览", "items": [
+                "月活用户：12,345", "营收：¥56,700",
+                "留存率：85%", "NPS：72"]},
+            {"type": "stats", "title": "核心增长指标", "items": [
+                "1.2M 总用户", "3x 年增长", "98% 满意度", "¥2.3M ARR"]},
+            {"type": "detail_page", "title": "关键指标详情", "items": [
+                "统计周期：2025 Q4", "数据源：内部分析平台",
+                "采样方式：全量", "置信度：95%"]},
+            {"type": "chart", "title": "趋势分析"},
+            {"type": "comparison", "title": "同比对比", "items": [
+                "2024 Q4：基线", "2025 Q4：+34%"]},
+            {"type": "summary", "title": "结论与建议"},
+        ],
+    },
+    "project_plan": {
+        "label": "项目计划 (Project Plan)",
+        "description": "项目启动：目标 → 里程碑 → 资源 → 风险 → 表单",
+        "theme": "business_blue", "narrative": "inform", "delivery": "editable",
+        "pages": [
+            {"type": "cover", "title": "项目名 + 启动时间"},
+            {"type": "section", "title": "01 项目目标"},
+            {"type": "list_page", "title": "关键里程碑", "items": [
+                "M1：需求确认（W1-W2）",
+                "M2：原型设计（W3-W4）",
+                "M3：开发实施（W5-W8）",
+                "M4：测试验收（W9-W10）"]},
+            {"type": "detail_page", "title": "资源分配", "items": [
+                "项目经理：1 人", "前端开发：2 人",
+                "后端开发：2 人", "测试：1 人"]},
+            {"type": "form_page", "title": "信息登记", "items": [
+                "项目名称：", "负责人：", "启动日期：", "预计完成："]},
+            {"type": "dashboard", "title": "预算概览", "items": [
+                "总预算：¥120,000", "已用：¥45,000",
+                "剩余：¥75,000", "使用率：37.5%"]},
+            {"type": "summary", "title": "下一步行动"},
+        ],
+    },
 }
 
 DEFAULT_TEMPLATE = "startup_pitch"

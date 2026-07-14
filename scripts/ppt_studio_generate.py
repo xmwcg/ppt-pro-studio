@@ -787,6 +787,247 @@ class Studio:
         self._txt(s, 1, 3.6, 11.3, 1.5, data.get("info", ""), size=16,
                   color=self.p["text"], align=PP_ALIGN.CENTER)
 
+    # -- new page layouts (P3-12: list/detail/form/dashboard/comparison/stats) --
+
+    def list_page(self, s, data):
+        """列表页: structured list with icon + heading + description per row.
+        Items use '：' separator (head：description), rendered as cards."""
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="content")
+        items = data.get("items", [])
+        if not items:
+            self._txt(s, 0.9, 3.0, 11.5, 0.6, "[ 暂无列表项 ]", size=14,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+            return
+        icons = ["check", "target", "lightbulb", "rocket", "pin", "star",
+                 "gear", "chart"]
+        n = len(items)
+        card_h = min(0.82, (4.8 / max(n, 1)) - 0.08)
+        gap = 0.08
+        y = 1.75
+        for i, item in enumerate(items):
+            parts = item.split("：", 1) if "：" in item else item.split(":", 1)
+            head = parts[0].strip()
+            desc = parts[1].strip() if len(parts) > 1 else ""
+            # card background
+            self._rect(s, 0.9, y, 11.5, card_h, self.p["surface"],
+                       line=self.p["line"])
+            # left accent border
+            self._rect(s, 0.9, y, 0.06, card_h, self.p["accent"])
+            # icon
+            self._icon(s, icons[i % len(icons)], 1.1, y + 0.12, 0.3,
+                       self.p["accent"])
+            # heading
+            sz, txt = _fit_text(head, 8.5, card_h * 0.55, 15)
+            self._txt(s, 1.55, y + 0.06, 8.5, card_h * 0.55, txt, size=sz,
+                      bold=True, color=self.p["text"])
+            # description
+            if desc:
+                dsz, dtxt = _fit_text(desc, 8.5, card_h * 0.4, 12)
+                self._txt(s, 1.55, y + card_h * 0.5, 8.5, card_h * 0.4, dtxt,
+                          size=dsz, color=self.p["muted"])
+            # index number on right
+            self._txt(s, 11.0, y + 0.06, 1.2, card_h * 0.5, str(i + 1),
+                      size=20, bold=True, color=self.p["primary"],
+                      align=PP_ALIGN.RIGHT)
+            y += card_h + gap
+
+    def detail_page(self, s, data):
+        """详情页: 2-column key-value grid. Items use '：' separator."""
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="content")
+        items = data.get("items", [])
+        if not items:
+            self._txt(s, 0.9, 3.0, 11.5, 0.6, "[ 暂无详情项 ]", size=14,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+            return
+        # 2-column grid
+        cols = 2
+        col_w = 5.65
+        gap_x = 0.3
+        gap_y = 0.15
+        n = len(items)
+        rows = (n + cols - 1) // cols
+        card_h = min(1.0, (4.6 / max(rows, 1)) - gap_y)
+        y0 = 1.8
+        for i, item in enumerate(items):
+            parts = item.split("：", 1) if "：" in item else item.split(":", 1)
+            key = parts[0].strip()
+            val = parts[1].strip() if len(parts) > 1 else "——"
+            col = i % cols
+            row = i // cols
+            x = 0.9 + col * (col_w + gap_x)
+            y = y0 + row * (card_h + gap_y)
+            # card
+            self._rect(s, x, y, col_w, card_h, self.p["surface"],
+                       line=self.p["line"])
+            # key label
+            self._txt(s, x + 0.15, y + 0.08, col_w - 0.3, card_h * 0.35,
+                      key, size=11, color=self.p["muted"])
+            # value
+            vsz, vtxt = _fit_text(val, col_w - 0.3, card_h * 0.55, 16)
+            self._txt(s, x + 0.15, y + card_h * 0.35, col_w - 0.3,
+                      card_h * 0.55, vtxt, size=vsz, bold=True,
+                      color=self.p["text"])
+
+    def form_page(self, s, data):
+        """表单页: labeled fields with underline-style value area.
+        Items are 'label：value' or 'label：' (blank for fill-in)."""
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="content")
+        items = data.get("items", [])
+        if not items:
+            self._txt(s, 0.9, 3.0, 11.5, 0.6, "[ 暂无表单字段 ]", size=14,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+            return
+        n = len(items)
+        row_h = min(0.85, 4.6 / max(n, 1))
+        y = 1.8
+        for item in items:
+            parts = item.split("：", 1) if "：" in item else item.split(":", 1)
+            label = parts[0].strip()
+            val = parts[1].strip() if len(parts) > 1 else ""
+            # label
+            self._txt(s, 0.9, y, 3.0, row_h * 0.7, label, size=14,
+                      bold=True, color=self.p["muted"],
+                      anchor=MSO_ANCHOR.MIDDLE, align=PP_ALIGN.RIGHT)
+            # underline value area
+            self._rect(s, 4.2, y + row_h * 0.6, 7.8, 0.02, self.p["line"])
+            if val:
+                self._txt(s, 4.3, y, 7.6, row_h * 0.6, val, size=14,
+                          color=self.p["text"], anchor=MSO_ANCHOR.MIDDLE)
+            y += row_h
+
+    def dashboard(self, s, data):
+        """仪表盘: KPI card grid with big numbers. Items use '：' separator
+        (metric：value), rendered as cards with colored top border."""
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="content")
+        items = data.get("items", [])
+        if not items:
+            self._txt(s, 0.9, 3.0, 11.5, 0.6, "[ 暂无数据卡片 ]", size=14,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+            return
+        colors = [self.p["accent"], self.p["secondary"], self.p["primary"],
+                  self.p.get("warning", "F2B705"), self.p["accent"],
+                  self.p["secondary"]]
+        cols = 2 if len(items) <= 4 else 3
+        col_w = (11.5 - (cols - 1) * 0.25) / cols
+        gap = 0.25
+        n = len(items)
+        rows = (n + cols - 1) // cols
+        card_h = min(1.8, (4.6 - (rows - 1) * gap) / max(rows, 1))
+        y0 = 1.8
+        for i, item in enumerate(items):
+            parts = item.split("：", 1) if "：" in item else item.split(":", 1)
+            key = parts[0].strip()
+            val = parts[1].strip() if len(parts) > 1 else "——"
+            col = i % cols
+            row = i // cols
+            x = 0.9 + col * (col_w + gap)
+            y = y0 + row * (card_h + gap)
+            c = colors[i % len(colors)]
+            # card
+            self._rect(s, x, y, col_w, card_h, self.p["surface"],
+                       line=self.p["line"])
+            # top border
+            self._rect(s, x, y, col_w, 0.05, c)
+            # big value
+            vsz, vtxt = _fit_text(val, col_w - 0.4, card_h * 0.5, 28)
+            self._txt(s, x + 0.2, y + 0.15, col_w - 0.4, card_h * 0.5, vtxt,
+                      size=vsz, bold=True, color=c)
+            # label
+            self._txt(s, x + 0.2, y + card_h * 0.6, col_w - 0.4,
+                      card_h * 0.3, key, size=12, color=self.p["muted"])
+
+    def comparison(self, s, data):
+        """对比页: side-by-side comparison columns. Each item is a column
+        with 'name：description'. Middle column is highlighted."""
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="content")
+        items = data.get("items", [])
+        if not items:
+            self._txt(s, 0.9, 3.0, 11.5, 0.6, "[ 暂无对比项 ]", size=14,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+            return
+        n = min(len(items), 4)
+        col_w = (11.5 - (n - 1) * 0.25) / n
+        gap = 0.25
+        y0 = 1.8
+        card_h = 4.6
+        for i in range(n):
+            parts = items[i].split("：", 1) if "：" in items[i] \
+                else items[i].split(":", 1)
+            name = parts[0].strip()
+            desc = parts[1].strip() if len(parts) > 1 else ""
+            x = 0.9 + i * (col_w + gap)
+            is_hl = (i == 1 and n >= 2)
+            fill = self.p["primary"] if is_hl else self.p["surface"]
+            txt_c = self.p["bg"] if is_hl else self.p["text"]
+            mut_c = self.p["bg"] if is_hl else self.p["muted"]
+            border_c = self.p["primary"] if is_hl else self.p["line"]
+            # card
+            self._rect(s, x, y0, col_w, card_h, fill, line=border_c,
+                       line_w=2 if is_hl else 1)
+            # header
+            self._txt(s, x + 0.15, y0 + 0.2, col_w - 0.3, 0.8, name,
+                      size=18, bold=True, color=txt_c, align=PP_ALIGN.CENTER)
+            # separator
+            self._rect(s, x + 0.3, y0 + 1.1, col_w - 0.6, 0.02, border_c)
+            # description
+            if desc:
+                dsz, dtxt = _fit_text(desc, col_w - 0.4, card_h - 1.5, 13)
+                self._txt(s, x + 0.2, y0 + 1.3, col_w - 0.4, card_h - 1.5,
+                          dtxt, size=dsz, color=mut_c)
+
+    def stats(self, s, data):
+        """数据统计: big KPI numbers in a row. Items are 'number label' or
+        'number：label', rendered as large numbers with small labels."""
+        self._bg(s)
+        self._title_bar(s, data.get("title", ""), data.get("subtitle"),
+                       stype="content")
+        items = data.get("items", [])
+        if not items:
+            self._txt(s, 0.9, 3.0, 11.5, 0.6, "[ 暂无统计指标 ]", size=14,
+                      color=self.p["muted"], align=PP_ALIGN.CENTER)
+            return
+        colors = [self.p["accent"], self.p["secondary"], self.p["primary"],
+                  "F2B705", "FF8FB1", "5BC0EB"]
+        n = min(len(items), 6)
+        col_w = 11.5 / n
+        y_num = 2.5
+        for i in range(n):
+            item = items[i]
+            # split number from label
+            parts = item.split(None, 1)
+            if len(parts) == 2:
+                num, label = parts[0], parts[1]
+            elif "：" in item:
+                p = item.split("：", 1)
+                num, label = p[0], p[1]
+            elif ":" in item:
+                p = item.split(":", 1)
+                num, label = p[0], p[1]
+            else:
+                num, label = item, ""
+            x = 0.9 + i * col_w
+            c = colors[i % len(colors)]
+            # big number
+            nsz, ntxt = _fit_text(num, col_w - 0.3, 1.5, 36)
+            self._txt(s, x, y_num, col_w - 0.1, 1.5, ntxt, size=nsz,
+                      bold=True, color=c, align=PP_ALIGN.CENTER)
+            # label
+            if label:
+                lsz, ltxt = _fit_text(label, col_w - 0.3, 0.5, 13)
+                self._txt(s, x, y_num + 1.6, col_w - 0.1, 0.5, ltxt,
+                          size=lsz, color=self.p["muted"],
+                          align=PP_ALIGN.CENTER)
+
     # -- dispatch ------------------------------------------------------------
     RENDERERS = {
         "cover": cover, "section": section, "agenda": agenda,
@@ -794,13 +1035,17 @@ class Studio:
         "chart": chart, "timeline": timeline, "quote": quote,
         "image": image, "media": media, "summary": summary, "bullets": bullets,
         "contact": contact,
+        # new page layouts (P3-12)
+        "list_page": list_page, "detail_page": detail_page,
+        "form_page": form_page, "dashboard": dashboard,
+        "comparison": comparison, "stats": stats,
     }
 
     def build(self, brief: dict, out_path: str, no_transition: bool = False,
               seed=None, duration: float = 0.5):
         self.p = select_theme(brief, THEMES)
         style = brief.get("theme") or brief.get("style") or "tech_dark"
-        slides = brief.get("slides", [])
+        slides = brief.get("slides") or brief.get("pages") or []
         total = len(slides)
         for idx, sl in enumerate(slides, 1):
             stype = sl.get("type", "content")
@@ -870,7 +1115,7 @@ def main():
         brief, args.out, no_transition=args.no_transition,
         seed=args.seed, duration=args.transition_duration)
     print(json.dumps({"ok": True, "file": os.path.abspath(out),
-                      "slides": len(brief.get("slides", [])),
+                      "slides": len(brief.get("slides") or brief.get("pages") or []),
                       "transitions": transitions,
                       "engine": "python-pptx (deterministic fallback)",
                       "theme": brief.get("theme") or brief.get("style", "tech_dark")},
